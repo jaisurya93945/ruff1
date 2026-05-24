@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Heart Hacking Playlist – a hacker's music player">
+  <title>Hacker Playlist</title>
+  <link rel="preconnect" href="https://c.saavncdn.com">
+  <link rel="preconnect" href="https://rukminim2.flixcart.com">
+  <link rel="preconnect" href="https://i1.sndcdn.com">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/favi.png" type="image/png">
+</head>
+<body>
+
+  <!-- Matrix rain canvas (replaces bg.gif) -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- Search -->
+  <div class="search-container" role="search">
+    <input type="text" id="search-input" placeholder="Search songs..." autocomplete="off" spellcheck="false" aria-label="Search songs">
+    <button class="search-button" id="search-btn" aria-label="Search">
+      <img src="img/search.png" alt="" class="search-icon" width="24" height="24">
+    </button>
+    <div id="suggestions" class="suggestions" role="listbox" aria-label="Search suggestions"></div>
+  </div>
+
+  <!-- Main player -->
+  <div class="music-player">
+    <h1>Heart Hacking Playlist</h1>
+    <h2>Songs that can exploit my heart...</h2>
+    <div id="playlist" class="playlist" role="list" aria-label="Song list">
+      <!-- Dynamically rendered by script.js -->
+    </div>
+  </div>
+
+  <!-- Now Playing overlay – the premium "greeting card" -->
+  <div id="now-playing-overlay" class="now-playing-overlay" role="dialog" aria-modal="true" aria-label="Now Playing" aria-hidden="true">
+    <div class="np-backdrop" id="np-backdrop"></div>
+    <div class="now-playing-card" id="np-card">
+
+      <button class="np-close" id="np-close" aria-label="Close now playing">&#10005;</button>
+
+      <!-- Album art -->
+      <div class="np-art-wrap">
+        <div class="np-art-ring"></div>
+        <img id="np-cover" class="np-cover" src="" alt="Album art" loading="lazy">
+      </div>
+
+      <!-- Song info -->
+      <div class="np-info">
+        <p class="np-title" id="np-title">-</p>
+        <p class="np-artist" id="np-artist">-</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="np-progress-wrap">
+        <div class="np-progress-track" id="np-progress-track" role="slider" aria-label="Song progress" tabindex="0">
+          <div class="np-progress-fill" id="np-progress-fill"></div>
+          <div class="np-progress-thumb" id="np-progress-thumb"></div>
+        </div>
+        <div class="np-times">
+          <span id="np-current">0:00</span>
+          <span id="np-total">0:00</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="np-controls">
+        <button class="np-btn" id="np-loop" title="Loop" aria-label="Toggle loop" aria-pressed="false">
+          <img src="img/arrow.png" alt="Loop" width="28" height="28">
+        </button>
+        <button class="np-btn" id="np-prev" aria-label="Previous song">
+          <img src="img/previous.png" alt="Previous" width="28" height="28">
+        </button>
+        <button class="np-btn np-playpause-btn" id="np-playpause" aria-label="Play/Pause">
+          <img id="np-playpause-img" src="img/play1.png" alt="Play" width="36" height="36">
+        </button>
+        <button class="np-btn" id="np-next" aria-label="Next song">
+          <img src="img/next.png" alt="Next" width="28" height="28">
+        </button>
+        <button class="np-btn" id="np-shuffle" title="Shuffle" aria-label="Toggle shuffle" aria-pressed="false">
+          <img src="img/shuffle.png" alt="Shuffle" width="28" height="28">
+        </button>
+      </div>
+
+      <!-- Volume -->
+      <div class="np-volume-wrap">
+        <span class="np-vol-label" aria-hidden="true">&#128266;</span>
+        <input type="range" id="np-volume" class="np-volume-slider" min="0" max="100" value="100" aria-label="Volume">
+        <span class="np-vol-label" aria-hidden="true">&#128266;</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom mini-bar -->
+  <div class="music-player-bar" id="player-bar" aria-label="Mini player">
+    <div class="bar-left" id="bar-info-area">
+      <img src="" alt="Now playing" class="song-img-small" id="bar-cover">
+      <div class="song-info">
+        <p class="song-title" id="bar-title">-</p>
+        <p class="movie-name" id="bar-artist">-</p>
+      </div>
+    </div>
+
+    <div class="progress-container" id="bar-progress-container" role="slider" aria-label="Song progress">
+      <div class="progress-bar" id="bar-progress-bar"></div>
+    </div>
+
+    <div class="time-display">
+      <span class="current-time" id="bar-current">0:00</span> /
+      <span class="total-time" id="bar-total">0:00</span>
+    </div>
+
+    <div class="controls">
+      <button class="control-button" id="bar-loop" aria-label="Toggle loop" title="Loop">
+        <img src="img/arrow.png" height="22" width="22" alt="Loop">
+      </button>
+      <button class="control-button" id="bar-prev" aria-label="Previous song">
+        <img src="img/previous.png" height="22" width="22" alt="Previous">
+      </button>
+      <button class="control-button" id="bar-playpause" aria-label="Play/Pause">
+        <img src="img/play1.png" height="22" width="22" alt="Play" id="bar-playpause-img">
+      </button>
+      <button class="control-button" id="bar-next" aria-label="Next song">
+        <img src="img/next.png" height="22" width="22" alt="Next">
+      </button>
+      <button class="control-button" id="bar-shuffle" aria-label="Toggle shuffle" title="Shuffle">
+        <img src="img/shuffle.png" height="22" width="22" alt="Shuffle">
+      </button>
+    </div>
+
+    <button class="bar-expand-btn" id="bar-expand" aria-label="Open now playing view">&#9650;</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
