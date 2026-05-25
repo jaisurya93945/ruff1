@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <title>Hacker Playlist</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/favi.png" type="image/png">
+  <link rel="preconnect" href="https://c.saavncdn.com">
+  <link rel="preconnect" href="https://i1.sndcdn.com">
+</head>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar"><span></span><span></span><span></span></button>
+
+<div class="app-container">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-glyph">⌗</span>
+      <div><div class="brand-name">Heart Hacking</div><div class="brand-sub">Playlist v2</div></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="library"><span class="nav-ico">◈</span>Library</button>
+      <button class="nav-item" data-view="favourites"><span class="nav-ico">♥</span>Favourites<span class="nav-badge" id="fav-badge"></span></button>
+      <button class="nav-item" data-view="recent"><span class="nav-ico">◷</span>Recently Played</button>
+      <button class="nav-item" data-view="queue"><span class="nav-ico">≡</span>Queue<span class="nav-badge" id="queue-badge"></span></button>
+    </nav>
+
+    <div class="sidebar-section">
+      <div class="sidebar-sec-hdr">PLAYLISTS<button class="new-pl-btn" id="new-pl-btn" title="New playlist" aria-label="New playlist">＋</button></div>
+      <div id="pl-nav"></div>
+    </div>
+
+    <div class="sidebar-footer" id="sidebar-footer">17 songs</div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-content">
+    <div class="main-topbar">
+      <div class="topbar-titles">
+        <h2 class="view-title" id="view-title">Library</h2>
+        <p class="view-sub" id="view-sub"></p>
+      </div>
+      <div class="search-wrap" role="search">
+        <img src="img/search.png" class="search-ico" alt="" width="16" height="16">
+        <input type="text" id="search-input" placeholder="Search songs, artists..." autocomplete="off" spellcheck="false" aria-label="Search">
+        <div id="suggestions" class="suggestions" role="listbox"></div>
+      </div>
+    </div>
+
+    <div class="genre-bar" id="genre-bar"></div>
+    <div id="view-content"><div id="playlist" class="playlist" role="list"></div></div>
+  </main>
+</div>
+
+<!-- ══ CONTEXT MENU ══ -->
+<div class="context-menu" id="context-menu" role="menu" hidden>
+  <button class="ctx-item" id="ctx-play"><span>▶</span>Play Now</button>
+  <button class="ctx-item" id="ctx-fav"><span>♥</span>Favourite</button>
+  <button class="ctx-item" id="ctx-queue"><span>＋</span>Add to Queue</button>
+  <button class="ctx-item" id="ctx-pl"><span>≡</span>Add to Playlist</button>
+</div>
+
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-hdr"><span id="modal-title">Select Playlist</span><button class="modal-x" id="modal-close">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ══ NOW PLAYING OVERLAY ══ -->
+<div id="now-playing-overlay" class="now-playing-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Now Playing">
+  <div class="np-backdrop" id="np-backdrop"></div>
+  <div class="now-playing-card" id="np-card">
+    <div class="np-bg-blur" id="np-bg-blur"></div>
+    <div class="np-inner">
+
+      <div class="np-topbar">
+        <button class="np-close" id="np-close" aria-label="Close">⌄</button>
+        <span class="np-now-tag">NOW PLAYING</span>
+        <button class="np-ctx" id="np-ctx" aria-label="More options">⋮</button>
+      </div>
+
+      <div class="np-art-wrap">
+        <div class="np-ring" id="np-ring"></div>
+        <img id="np-cover" class="np-cover" src="" alt="Album art" loading="lazy">
+      </div>
+
+      <div class="np-info-row">
+        <div class="np-info">
+          <div class="np-title-scroller"><p class="np-title" id="np-title">—</p></div>
+          <p class="np-artist" id="np-artist">—</p>
+        </div>
+        <button class="np-heart" id="np-heart" aria-label="Favourite" aria-pressed="false">♥</button>
+      </div>
+
+      <div class="np-prog-wrap">
+        <div class="np-track" id="np-track" role="slider" tabindex="0" aria-label="Song progress">
+          <div class="np-fill" id="np-fill"></div>
+          <div class="np-thumb" id="np-thumb"></div>
+        </div>
+        <div class="np-times"><span id="np-cur">0:00</span><span id="np-tot">0:00</span></div>
+      </div>
+
+      <div class="np-controls">
+        <button class="np-btn" id="np-loop" aria-label="Loop" aria-pressed="false" title="Loop"><img src="img/arrow.png" alt="Loop" width="22" height="22"></button>
+        <button class="np-btn" id="np-prev" aria-label="Previous"><img src="img/previous.png" alt="Prev" width="26" height="26"></button>
+        <button class="np-btn np-main" id="np-playpause" aria-label="Play"><img id="np-pp-img" src="img/play1.png" alt="Play" width="30" height="30"></button>
+        <button class="np-btn" id="np-next" aria-label="Next"><img src="img/next.png" alt="Next" width="26" height="26"></button>
+        <button class="np-btn" id="np-shuffle" aria-label="Shuffle" aria-pressed="false" title="Shuffle"><img src="img/shuffle.png" alt="Shuffle" width="22" height="22"></button>
+      </div>
+
+      <div class="np-extras">
+        <button class="np-extra-btn" id="np-speed-btn" title="Playback speed">1.0x</button>
+        <button class="np-extra-btn" id="np-sleep-btn" title="Sleep timer">💤 Off</button>
+        <button class="np-extra-btn" id="np-qadd-btn" title="Add to queue">＋ Queue</button>
+        <button class="np-extra-btn" id="np-pladd-btn" title="Add to playlist">≡ Playlist</button>
+      </div>
+
+      <div class="np-vol-row">
+        <span class="vol-ico">🔈</span>
+        <input type="range" id="np-vol" class="np-vol-slider" min="0" max="100" value="100" aria-label="Volume">
+        <span class="vol-ico">🔊</span>
+      </div>
+
+      <div class="np-nextup" id="np-nextup">
+        <span class="nextup-label">NEXT</span>
+        <span class="nextup-title" id="np-next-title">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SPEED POPUP ══ -->
+<div class="mini-popup" id="speed-popup" hidden>
+  <div class="popup-title">Playback Speed</div>
+  <div class="popup-opts">
+    <button class="popup-opt" data-speed="0.5">0.5×</button>
+    <button class="popup-opt" data-speed="0.75">0.75×</button>
+    <button class="popup-opt active" data-speed="1">Normal</button>
+    <button class="popup-opt" data-speed="1.25">1.25×</button>
+    <button class="popup-opt" data-speed="1.5">1.5×</button>
+    <button class="popup-opt" data-speed="2">2×</button>
+  </div>
+</div>
+
+<!-- ══ SLEEP POPUP ══ -->
+<div class="mini-popup" id="sleep-popup" hidden>
+  <div class="popup-title">Sleep Timer</div>
+  <div class="popup-opts">
+    <button class="popup-opt active" data-sleep="0">Off</button>
+    <button class="popup-opt" data-sleep="900">15 min</button>
+    <button class="popup-opt" data-sleep="1800">30 min</button>
+    <button class="popup-opt" data-sleep="3600">1 hour</button>
+    <button class="popup-opt" data-sleep="5400">1.5 hr</button>
+  </div>
+  <div class="sleep-remaining" id="sleep-remaining" hidden></div>
+</div>
+
+<!-- ══ BOTTOM BAR ══ -->
+<div class="music-player-bar" id="player-bar">
+  <div class="bar-left" id="bar-info-area">
+    <img src="" alt="Now playing" class="song-img-small" id="bar-cover">
+    <div class="song-info">
+      <p class="song-title" id="bar-title">—</p>
+      <p class="movie-name" id="bar-artist">—</p>
+    </div>
+    <button class="bar-heart" id="bar-heart" aria-label="Favourite">♥</button>
+  </div>
+
+  <div class="bar-center">
+    <div class="progress-container" id="bar-prog-cont" role="slider" aria-label="Seek">
+      <div class="progress-bar" id="bar-prog-bar"></div>
+    </div>
+    <div class="controls">
+      <button class="control-button" id="bar-loop" title="Loop"><img src="img/arrow.png" width="20" height="20" alt="Loop"></button>
+      <button class="control-button" id="bar-prev" aria-label="Previous"><img src="img/previous.png" width="20" height="20" alt="Prev"></button>
+      <button class="control-button bar-pp-btn" id="bar-playpause" aria-label="Play"><img id="bar-pp-img" src="img/play1.png" width="22" height="22" alt="Play"></button>
+      <button class="control-button" id="bar-next" aria-label="Next"><img src="img/next.png" width="20" height="20" alt="Next"></button>
+      <button class="control-button" id="bar-shuffle" title="Shuffle"><img src="img/shuffle.png" width="20" height="20" alt="Shuffle"></button>
+    </div>
+  </div>
+
+  <div class="bar-right">
+    <div class="time-display"><span id="bar-cur">0:00</span> / <span id="bar-tot">0:00</span></div>
+    <button class="bar-expand" id="bar-expand" aria-label="Open now playing">▲</button>
+  </div>
+</div>
+
+<div id="toast-root" class="toast-root"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
