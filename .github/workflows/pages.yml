@@ -1,44 +1,91 @@
-name: Deploy to GitHub Pages
+# ═══════════════════════════════════════════════════════════════
+#  Keeps audio/manifest.json in step with whatever is in audio/.
+#
+#  Why this does NOT deploy
+#  ────────────────────────
+#  This repository's Pages source is a branch, so GitHub already
+#  runs its own "pages build and deployment" on every push to
+#  main. An actions/deploy-pages step here would be a *second*
+#  deployer competing for the same lock — which is exactly what
+#  failed on the AURA merge commit:
+#
+#    HttpError: Deployment request failed ... due to in progress
+#    deployment. Please cancel first or wait for it to complete.
+#
+#  So this workflow only regenerates the manifest and commits it
+#  back; GitHub's own pipeline then publishes the result. That
+#  means you can drag an .mp3 straight into the GitHub web UI and
+#  it shows up in the player — tags, cover art and duration
+#  included — without running anything locally.
+#
+#  If you ever switch Settings → Pages → Source to "GitHub
+#  Actions", GitHub's built-in pipeline stops running and nothing
+#  will publish the site. Uncomment the `deploy` job at the
+#  bottom at that point (and only then).
+# ═══════════════════════════════════════════════════════════════
+name: Sync audio manifest
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'audio/**'
+      - 'tools/build-manifest.mjs'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: manifest-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  manifest:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
 
-      # Regenerate the library index so newly committed audio shows up
-      # without anyone having to remember to run it locally.
-      - name: Build audio manifest
+      - name: Rebuild manifest
         run: node tools/build-manifest.mjs
 
-      - uses: actions/configure-pages@v5
+      - name: Commit if anything changed
+        run: |
+          if [ -z "$(git status --porcelain audio/manifest.json images/covers)" ]; then
+            echo "Manifest already up to date — nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio/manifest.json images/covers
+          git commit -m "chore: rebuild audio manifest"
+          git push
+          echo "Manifest updated; Pages will rebuild from the new commit."
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+# ── Only needed if Pages source is switched to "GitHub Actions" ──
+#
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: manifest
+#    permissions:
+#      pages: write
+#      id-token: write
+#    environment:
+#      name: github-pages
+#      url: ${{ steps.deployment.outputs.page_url }}
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          ref: main          # pick up the manifest commit above
+#      - uses: actions/configure-pages@v5
+#      - uses: actions/upload-pages-artifact@v3
+#        with:
+#          path: .
+#      - name: Deploy to GitHub Pages
+#        id: deployment
+#        uses: actions/deploy-pages@v4

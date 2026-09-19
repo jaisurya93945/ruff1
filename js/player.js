@@ -45,11 +45,16 @@ export const player = {
   /** queue a track to play right after the current one */
   playNext(trackOrId) {
     const id = typeof trackOrId === 'string' ? trackOrId : trackOrId.id;
+    const currentId = state.queue[state.qIndex] ?? null;
+    if (id === currentId) return;                    // it is already playing
+
     const q = state.queue.filter(x => x !== id);
-    const at = clamp(state.qIndex + 1, 0, q.length);
-    q.splice(at, 0, id);
-    const newIndex = state.qIndex >= 0 ? q.indexOf(state.queue[state.qIndex] ?? id) : -1;
-    set({ queue: q, qIndex: newIndex < 0 ? state.qIndex : newIndex }, 'queue');
+    // the insertion point has to be measured against the *filtered* queue:
+    // pulling a track out from before the cursor shifts everything down one
+    const curIdx = currentId ? q.indexOf(currentId) : -1;
+    q.splice(clamp(curIdx + 1, 0, q.length), 0, id);
+
+    set({ queue: q, qIndex: curIdx < 0 ? state.qIndex : curIdx }, 'queue');
     emit('notify', { text: 'Playing next', icon: 'queue' });
   },
 
@@ -66,14 +71,17 @@ export const player = {
 
   removeAt(index) {
     if (index < 0 || index >= state.queue.length) return;
+    const wasPlaying = index === state.qIndex;       // capture before set() moves it
+
     const q = [...state.queue];
     q.splice(index, 1);
     let i = state.qIndex;
     if (index < i) i--;
-    else if (index === i) i = Math.min(i, q.length - 1);
+    else if (wasPlaying) i = Math.min(i, q.length - 1);
+
     set({ queue: q, qIndex: i }, 'queue');
-    if (index === state.qIndex && q.length) this.playAt(i);
-    else if (!q.length) this.stop();
+    if (!q.length) this.stop();
+    else if (wasPlaying) this.playAt(i);
   },
 
   moveInQueue(from, to) {

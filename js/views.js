@@ -30,6 +30,8 @@ const RENDERERS = {};
 export function renderView(name) {
   const node = view(name);
   if (!node) return;
+  node._cleanup?.();          // drop listeners the previous render attached
+  node._cleanup = null;
   node.innerHTML = '';
   RENDERERS[name]?.(node);
   node.scrollTop = 0;
@@ -279,10 +281,16 @@ function virtualList(tracks) {
   requestAnimationFrame(() => {
     paint();
     const sc = scroller();
+    if (!sc) return;
     const onScroll = () => requestAnimationFrame(paint);
-    sc?.addEventListener('scroll', onScroll, { passive: true });
+    sc.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
-    host._cleanup = () => { sc?.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
+    // renderView() calls this before wiping the view, so repeated visits
+    // to the library don't stack up one scroll handler per render
+    sc._cleanup = () => {
+      sc.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   });
   return host;
 }
