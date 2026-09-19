@@ -101,23 +101,58 @@ tools/           build-manifest · serve · gen-portraits · gen-icons · aura-w
 sw.js            service worker (offline shell)
 ```
 
-### Adding music
+### Adding songs
 
-Drop files in `audio/` and re-run the builder:
+**The easy way — straight from github.com, no tools, works from a phone:**
+
+1. Open your repo → the **`audio/`** folder → **Add file → Upload files**
+2. Drag your `.mp3`s in → **Commit changes**
+3. Wait about a minute. That's it — refresh the player and they're there.
+
+A workflow notices the upload, reads each file's ID3 tags for the title,
+artist, album and year, pulls the embedded cover art out into
+`images/covers/`, works out the duration from the MP3 frame headers, strips
+download-site junk from the titles (`Tum Hi Ho - PagalSongs.com` →
+`Tum Hi Ho`), and commits the updated `audio/manifest.json` back.
+
+> **One-time setup for this to work:** Settings → Actions → General →
+> Workflow permissions → **Read and write permissions** → Save. Without it
+> the workflow can't commit the manifest back, and it will tell you so in the
+> Actions log rather than failing quietly.
+
+**From a computer, if you prefer:**
 
 ```bash
+cp ~/Music/*.mp3 audio/
 node tools/build-manifest.mjs
+git add -A && git commit -m "add songs" && git push
 ```
 
-It reads ID3 tags, extracts embedded cover art into `images/covers/`, works out
-MP3 durations from frame headers (CBR and Xing/VBR), and strips the junk that
-download sites staple onto tags (`Tum Hi Ho - PagalSongs.com` → `Tum Hi Ho`).
+**Just to listen right now, not to keep:** drag files onto the player window.
+They play immediately and stay on that device — nothing is uploaded, and they
+won't appear on your other devices.
 
-**Re-running is safe.** Anything you hand-edited in `audio/manifest.json` is
-preserved. Delete a field to have it re-detected.
+### Adding cover images
 
-Cover art is matched in this order: embedded tag → `images/<same-filename>.jpg`
-→ nothing.
+Most of the time you don't have to — art embedded in the mp3 is extracted
+automatically. When a track has none, cover art is found in this order:
+
+1. artwork embedded in the file's ID3 tag → extracted to `images/covers/`
+2. **an image in `images/` with the same filename as the audio**
+3. a generated placeholder
+
+So for `audio/husn.mp3`, upload `images/husn.jpg` and it is picked up. `.jpg`,
+`.png`, `.webp` and `.gif` all work.
+
+To point a track at any other image, edit `audio/manifest.json` directly:
+
+```json
+{ "title": "Husn", "src": "audio/husn.mp3", "cover": "images/anything.jpg" }
+```
+
+**Hand-edits stick.** Re-running the builder never overwrites a field you
+changed — fix a title or swap the art and it stays. Delete a field to have it
+detected again.
 
 ### Lyrics
 

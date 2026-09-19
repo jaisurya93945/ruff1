@@ -365,6 +365,56 @@ export const cloud = {
   },
 };
 
+/* ═══════════════════════════════════════════════════════════
+   Pairing — move the endpoint + room key to another device
+   without retyping a secret on a phone keyboard.
+   ═══════════════════════════════════════════════════════════ */
+
+/** a strong room key, so nobody has to invent one */
+export function generateRoomKey() {
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, '').slice(0, 24);
+}
+
+/** a link that configures whichever device opens it */
+export function pairingLink() {
+  const payload = btoa(JSON.stringify({
+    e: (state.settings.syncEndpoint || '').trim(),
+    r: (state.settings.syncRoom || '').trim(),
+  })).replace(/=+$/, '');
+  const url = new URL(location.href);
+  url.hash = '';
+  url.search = '';
+  return `${url.href}?pair=${encodeURIComponent(payload)}`;
+}
+
+/**
+ * Consume ?pair=… on boot. Returns true if this device was just linked.
+ * The parameter is stripped from the URL immediately so the secret does
+ * not linger in history or get shared by accident.
+ */
+export function consumePairingLink(setSetting) {
+  const params = new URLSearchParams(location.search);
+  const raw = params.get('pair');
+  if (!raw) return false;
+
+  // clear it from the address bar before doing anything else
+  params.delete('pair');
+  const clean = location.pathname + (params.toString() ? '?' + params : '') + location.hash;
+  history.replaceState(null, '', clean);
+
+  try {
+    const { e, r } = JSON.parse(atob(decodeURIComponent(raw)));
+    if (!e || !r || String(r).length < 8) return false;
+    setSetting('syncEndpoint', String(e));
+    setSetting('syncRoom', String(r));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function trackSrcToTrack(src) {
   return state.tracks.find(t => t.src === src) || null;
 }

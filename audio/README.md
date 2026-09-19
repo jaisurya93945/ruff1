@@ -1,12 +1,21 @@
 # audio/
 
-Put your music here, then run:
+Put your music here.
+
+**From github.com (easiest, works on a phone):** Add file → Upload files →
+drag your mp3s in → Commit. A workflow rebuilds `manifest.json` automatically
+about a minute later.
+
+Needs Settings → Actions → General → Workflow permissions →
+**Read and write permissions**, once.
+
+**From a computer:**
 
 ```bash
 node tools/build-manifest.mjs
 ```
 
-That writes `manifest.json` — the list AURA reads on startup.
+Either way that writes `manifest.json` — the list AURA reads on startup.
 
 ### Supported
 `.mp3` `.m4a` `.aac` `.ogg` `.opus` `.wav` `.flac` `.webm`

@@ -64,7 +64,18 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add audio/manifest.json images/covers
           git commit -m "chore: rebuild audio manifest"
-          git push
+
+          if ! git push; then
+            echo "::error title=Cannot push the manifest::The workflow could not write to the repository."
+            echo ""
+            echo "This is almost always one repository setting:"
+            echo "  Settings -> Actions -> General -> Workflow permissions"
+            echo "  -> select 'Read and write permissions' -> Save"
+            echo ""
+            echo "Until then, newly uploaded audio will not appear in the player."
+            echo "You can also run 'node tools/build-manifest.mjs' locally and commit the result."
+            exit 1
+          fi
           echo "Manifest updated; Pages will rebuild from the new commit."
 
 # ── Only needed if Pages source is switched to "GitHub Actions" ──

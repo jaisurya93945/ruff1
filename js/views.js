@@ -21,7 +21,7 @@ import {
   makeVibeCard, shareVibeCard, presence, tabSync, echoHeat,
 } from './features.js';
 import { arcPreset } from './analysis.js';
-import { cloud } from './cloud.js';
+import { cloud, generateRoomKey, pairingLink } from './cloud.js';
 import { usage, persistStorage, nuke } from './db.js';
 
 const view = (name) => $(`.view[data-view="${name}"]`);
@@ -922,9 +922,37 @@ RENDERERS.settings = (root) => {
     el('div.set-row', { style: { display: 'block' } }, [
       el('div.field', { style: { margin: 0 } }, [
         el('label', { text: 'Room key' }),
-        syncRoom,
+        el('div.row', { style: { gap: '8px' } }, [
+          el('div.grow', {}, [syncRoom]),
+          el('button.btn.sm', {
+            title: 'Generate a strong key',
+            onclick: () => { syncRoom.value = generateRoomKey(); saveSync(); toast('Key generated — use the pairing link to copy it across', { icon: 'check', ms: 5000 }); },
+          }, [icon('wand'), 'Generate']),
+        ]),
         el('small', { html: 'At least 8 characters, identical on every device. This is the <b>only</b> credential — anyone who knows it can read and write your playlists, so treat it like a password.' }),
       ]),
+    ]),
+    el('div.set-row', {}, [
+      el('div.grow', {}, [
+        el('b', { text: 'Link another device' }),
+        el('small', { text: 'copy this, open it once on your phone, and it configures itself — no typing' }),
+      ]),
+      el('button.btn.sm', {
+        onclick: async () => {
+          if (!cloud.enabled) { toast('Fill in the endpoint and room key first', { error: true }); return; }
+          const link = pairingLink();
+          try {
+            await navigator.clipboard.writeText(link);
+            toast('Pairing link copied — open it on the other device', { icon: 'check', ms: 5000 });
+          } catch {
+            sheet({
+              title: 'Pairing link',
+              sub: 'Open this once on your other device. It carries your room key, so send it only to yourself.',
+              body: el('div.field', {}, [el('textarea', { readonly: true, style: { minHeight: '92px' }, text: link })]),
+            });
+          }
+        },
+      }, [icon('sync'), 'Copy link']),
     ]),
     toggleRow('Live Follow', 'follow the other device continuously instead of just offering to pick up where it left off — expect a second or two of drift', 'liveFollow', () => cloud.schedulePoll()),
     el('div.set-row', {}, [

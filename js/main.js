@@ -18,7 +18,7 @@ import {
 import {
   toast, modal, closeModal, modalOpen, confirm, WaveformView, LyricsView, trackRow, lazyImg, FALLBACK_ART, closeContext,
 } from './ui.js';
-import { cloud } from './cloud.js';
+import { cloud, consumePairingLink } from './cloud.js';
 import {
   setView, renderView, refreshCurrentView, openEQ, openVocal, openSpeed, openSleep,
   openVibeCard, openMoodDJ, openHelp, openMarks, applyLabToggle, stopMarkLoop,
@@ -40,6 +40,9 @@ const boot = {
 let viz, ring, wave, lyrics;
 
 async function start() {
+  // a ?pair= link configures this device and strips itself from the URL
+  const paired = consumePairingLink(setSetting);
+
   initThemes();
   engine.init();
 
@@ -88,6 +91,9 @@ async function start() {
   setView('home');
   renderPresence();
   restoreSession();
+  if (paired) {
+    toast('Device linked — pulling your library', { icon: 'sync', ms: 5000 });
+  }
 
   boot.done();
   registerServiceWorker();

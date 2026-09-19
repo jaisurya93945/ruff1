@@ -1,0 +1,16 @@
+# Deploy the sync worker from a terminal instead of the dashboard:
+#
+#   npx wrangler kv namespace create AURA     # prints an id
+#   # paste that id below, then:
+#   npx wrangler deploy
+#
+# Prefer clicking? Skip this file entirely — the dashboard steps are in
+# the header of tools/aura-worker.js and take about the same time.
+
+name = "aura-sync"
+main = "tools/aura-worker.js"
+compatibility_date = "2026-01-01"
+
+[[kv_namespaces]]
+binding = "AURA"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
