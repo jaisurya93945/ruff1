@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Husn",
+    "artist": "Anuv Jain",
+    "album": "Husn",
+    "src": "audio/husn.mp3",
+    "cover": "images/covers/husn.jpg",
+    "genre": [],
+    "year": 2023,
+    "duration": 218
+  },
+  {
+    "title": "Tum Hi Ho",
+    "artist": "Arijit Singh",
+    "album": "Aashiqui 2 (2013)",
+    "src": "audio/tumhiho.mp3",
+    "cover": "images/covers/tumhiho.jpg",
+    "genre": [],
+    "year": 2013,
+    "duration": 262.1
+  }
+]

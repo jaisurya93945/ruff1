@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 620" width="400" height="620" role="img" aria-label="Kurone, the kurone theme portrait">
+<defs>
+  <linearGradient id="hair-kurone" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3c4a44"/><stop offset=".55" stop-color="#1d2723"/><stop offset="1" stop-color="#0d1411"/>
+  </linearGradient>
+  <linearGradient id="hairF-kurone" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3c4a44"/><stop offset="1" stop-color="#1d2723"/>
+  </linearGradient>
+  <linearGradient id="skin-kurone" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f6dccf"/><stop offset="1" stop-color="#d7bdb0"/>
+  </linearGradient>
+  <linearGradient id="fit-kurone" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#121a17"/><stop offset="1" stop-color="#1f2e28"/>
+  </linearGradient>
+  <radialGradient id="iris-kurone" cx=".5" cy=".34" r=".72">
+    <stop offset="0" stop-color="#a6ff7d"/><stop offset=".62" stop-color="#a6ff7d"/><stop offset="1" stop-color="#2d6b22"/>
+  </radialGradient>
+  <radialGradient id="glow-kurone" cx=".5" cy=".42" r=".6">
+    <stop offset="0" stop-color="#3c4a44" stop-opacity=".55"/><stop offset="1" stop-color="#3c4a44" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="face-kurone">
+    <path d="M124 196c0-62 30-98 76-98s76 36 76 98c0 50-32 100-76 118-44-18-76-68-76-118Z"/>
+  </clipPath>
+</defs>
+
+<ellipse cx="200" cy="300" rx="200" ry="260" fill="url(#glow-kurone)"/>
+
+<!-- hair, back layer -->
+<path d="M200 54C126 54 84 108 80 188c-3 58-6 108-8 150 24 16 52 24 84 26-18-40-22-92-16-136-10-62 6-108 60-124 54 16 70 62 60 124 6 44 2 96-16 136 32-2 60-10 84-26-2-42-5-92-8-150-4-80-46-134-120-134Z" fill="url(#hair-kurone)"/>
+
+<!-- shoulders -->
+<path d="M200 322c-16 0-30 10-34 26-52 14-88 54-96 112-6 44-8 100-8 160h276c0-60-2-116-8-160-8-58-44-98-96-112-4-16-18-26-34-26Z" fill="url(#fit-kurone)"/>
+<path d="M166 348c10 22 20 34 34 34s24-12 34-34l-16-8c-6 10-11 14-18 14s-12-4-18-14Z" fill="#e7cdc0"/>
+
+<!-- neck -->
+<path d="M176 268h48v54c0 12-10 20-24 20s-24-8-24-20Z" fill="#d2b8ab"/>
+
+<!-- face -->
+<path d="M124 196c0-62 30-98 76-98s76 36 76 98c0 50-32 100-76 118-44-18-76-68-76-118Z" fill="url(#skin-kurone)"/>
+<g clip-path="url(#face-kurone)">
+  <ellipse cx="160" cy="246" rx="19" ry="9" fill="#ff8fa8" opacity=".3"/>
+  <ellipse cx="240" cy="246" rx="19" ry="9" fill="#ff8fa8" opacity=".3"/>
+</g>
+<ellipse cx="126" cy="214" rx="9" ry="14" transform="rotate(-14 126 214)" fill="#ddc3b6"/>
+<ellipse cx="274" cy="214" rx="9" ry="14" transform="rotate(14 274 214)" fill="#ddc3b6"/>
+
+<!-- eyes -->
+<g transform="translate(160 214) scale(1 1)">
+  <path d="M-25-6c3-13 14-20 25-20s22 7 25 20c2 18-10 32-25 32S-27 12-25-6Z" fill="#fffdfa"/>
+  <ellipse cx="0" cy="4" rx="17" ry="20" fill="url(#iris-kurone)"/>
+  <ellipse cx="0" cy="5" rx="7.5" ry="10" fill="#1a1320" opacity=".9"/>
+  <circle cx="-6" cy="-5" r="5.6" fill="#fff" opacity=".95"/>
+  <circle cx="6" cy="11" r="3" fill="#fff" opacity=".6"/>
+  <path d="M-27-8c4-15 15-23 27-23s23 8 27 23" fill="none" stroke="#2d6b22" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M-27-8c-4-3-8-4-11-3" fill="none" stroke="#2d6b22" stroke-width="6" stroke-linecap="round"/>
+</g>
+<g transform="translate(240 214) scale(-1 1)">
+  <path d="M-25-6c3-13 14-20 25-20s22 7 25 20c2 18-10 32-25 32S-27 12-25-6Z" fill="#fffdfa"/>
+  <ellipse cx="0" cy="4" rx="17" ry="20" fill="url(#iris-kurone)"/>
+  <ellipse cx="0" cy="5" rx="7.5" ry="10" fill="#1a1320" opacity=".9"/>
+  <circle cx="-6" cy="-5" r="5.6" fill="#fff" opacity=".95"/>
+  <circle cx="6" cy="11" r="3" fill="#fff" opacity=".6"/>
+  <path d="M-27-8c4-15 15-23 27-23s23 8 27 23" fill="none" stroke="#2d6b22" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M-27-8c-4-3-8-4-11-3" fill="none" stroke="#2d6b22" stroke-width="6" stroke-linecap="round"/>
+</g>
+
+<!-- brows -->
+<path d="M138 186c8-8 24-11 38-6" fill="none" stroke="#0d1411" stroke-width="5" stroke-linecap="round" opacity=".82"/>
+<path d="M262 186c-8-8-24-11-38-6" fill="none" stroke="#0d1411" stroke-width="5" stroke-linecap="round" opacity=".82"/>
+
+<!-- nose + mouth -->
+<path d="M200 244c3 4 6 6 9 7" fill="none" stroke="#aa9083" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+<path d="M188 274c5 7 19 7 24 0" fill="none" stroke="#c2606a" stroke-width="3.6" stroke-linecap="round"/>
+
+<!-- hair, front -->
+<path d="M106 178c-6 46-4 92 4 130l28-8c-8-38-10-84-4-126Z M294 178c6 46 4 92-4 130l-28-8c8-38 10-84 4-126Z" fill="url(#hairF-kurone)"/>
+<path d="M104 192c-4-76 34-126 96-126s100 50 96 126c-10-22-24-38-42-48l-10 42-20-46c-12 14-30 22-50 20l-12 36-16-52c-18 12-32 28-42 48Z" fill="url(#hairF-kurone)"/>
+<path d="M150 104c22-14 60-18 92-4" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".28"/>
+
+
+      <rect x="164" y="316" width="72" height="16" rx="8" fill="#12100f"/>
+      <circle cx="200" cy="324" r="7" fill="#a6ff7d"/>
+      <path d="M200 331v16" stroke="#12100f" stroke-width="3"/>
+      <circle cx="200" cy="352" r="6" fill="#a6ff7d" opacity=".8"/>
+</svg>
