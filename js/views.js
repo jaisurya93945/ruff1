@@ -11,7 +11,7 @@ import {
 import { player } from './player.js';
 import { engine, EQ_BANDS, EQ_PRESETS } from './engine.js';
 import { SORTS, groupBy, importFiles, pickFolder, makeTrack } from './library.js';
-import { THEMES, MORPHS, applyTheme, applyMode, applyMorph, applyMotion, applyPerf, openThemeDock, portraitURL } from './themes.js';
+import { THEMES, MORPHS, applyTheme, applyMode, applyMorph, applyMotion, applyPerf, openThemeDock, portraitArt, paintArt, pickArtFor } from './themes.js';
 import {
   toast, modal, sheet, closeModal, confirm, contextMenu, lazyImg, trackRow, emptyState,
   stagger, sectionHead, statTile, registerDialogs, FALLBACK_ART,
@@ -21,6 +21,7 @@ import {
   makeVibeCard, shareVibeCard, presence, tabSync, echoHeat,
 } from './features.js';
 import { arcPreset } from './analysis.js';
+import { cloud } from './cloud.js';
 import { usage, persistStorage, nuke } from './db.js';
 
 const view = (name) => $(`.view[data-view="${name}"]`);
@@ -48,8 +49,17 @@ RENDERERS.home = (root) => {
 
   /* ── hero ── */
   const hero = el('div.hero');
-  const waifu = el('div.hero-waifu');
-  portraitURL(theme.id).then(url => { waifu.style.backgroundImage = `url("${url}")`; });
+  const waifu = el('div.hero-waifu', {
+    title: 'Tap to use your own artwork',
+    onclick: () => pickArtFor(theme, async () => {
+      paintArt(waifu, await portraitArt(theme.id));
+    }),
+  });
+  portraitArt(theme.id).then(a => {
+    paintArt(waifu, a);
+    // generated vectors want the full figure; a real photo wants to fill the slot
+    waifu.classList.toggle('is-photo', !!a.custom || a.fit === 'cover');
+  });
   hero.append(waifu);
 
   const totalMs = Object.values(state.stats).reduce((a, s) => a + (s.ms || 0), 0);
@@ -712,7 +722,8 @@ RENDERERS.lab = (root) => {
     { icon:'wand', title:'Mood DJ', body:'Reads the energy of every track and orders a set along a curve: warm up, peak, land softly.', action:{ label:'Build a set', run: openMoodDJ } },
     { icon:'fire', title:'Echo map', body:'The player remembers which seconds you replay and paints them as heat on the waveform. Your hot loops, visible.', action:{ label:'How it looks', run: explainEcho } },
     { icon:'mark', title:'Moment marks', body:'Pin the exact second of a drop, a lyric, a laugh. Jump back or loop between two marks.', action:{ label:'See marks', run: () => { const t = state.current || state.tracks[0]; t ? openMarks(t) : toast('Add some music first'); } } },
-    { icon:'sync', title:'Tab party', body:'Every open tab on this device stays on the same track and the same second. Control it from any of them.', toggle:'tabSync' },
+    { icon:'sync', title:'Tab party', body:'Every open tab in this browser stays on the same track and the same second. Same device only \u2014 for phone-to-laptop use Cross-device sync.', toggle:'tabSync' },
+    { icon:'sync', title:'Cross-device sync', body:'Playlists, favourites, marks, play counts and your exact position, shared between your phone and your laptop through a free worker you host.', action:{ label:'Set up', run: () => setView('settings') } },
     { icon:'card', title:'Vibe card', body:'Renders what’s playing as a share-ready image — cover, waveform, your play count.', action:{ label:'Make one', run: openVibeCard } },
     { icon:'moon', title:'Sleep timer', body:'Fades out over the last 30 seconds instead of cutting off mid-bar.', action:{ label:'Set', run: openSleep } },
     { icon:'speed', title:'Speed & pitch', body:'0.5× to 2×, with pitch preserved so it still sounds like the song.', action:{ label:'Adjust', run: openSpeed } },
@@ -858,6 +869,82 @@ RENDERERS.settings = (root) => {
     el('div.set-row', {}, [
       el('div.grow', {}, [el('b', { text: 'Equalizer' }), el('small', { text: state.settings.eqEnabled ? `On · ${state.settings.eqPreset}` : 'Off' })]),
       el('button.btn.sm', { onclick: openEQ }, [icon('eq'), 'Open']),
+    ]),
+  ]));
+
+  /* ── sync across devices ── */
+  const syncEp = el('input', { type: 'url', value: state.settings.syncEndpoint || '', placeholder: 'https://your-worker.workers.dev' });
+  const syncRoom = el('input', { type: 'text', value: state.settings.syncRoom || '', placeholder: 'a long private phrase, same on every device' });
+  const syncState = el('small', { text: syncStatusText() });
+
+  function syncStatusText() {
+    if (!cloud.enabled) return 'Off — add an endpoint and a room key below.';
+    const map = { off: 'Off.', ready: 'Connected.', syncing: 'Syncing…', error: 'Problem: ' + (cloud.detail || 'unknown') };
+    const base = map[cloud.status] || 'Connected.';
+    return cloud.detail && cloud.status === 'ready' ? `${base} ${cloud.detail}.` : base;
+  }
+
+  const testBtn = el('button.btn.sm', {
+    onclick: async () => {
+      testBtn.disabled = true;
+      const old = testBtn.textContent;
+      testBtn.textContent = 'Checking…';
+      const r = await cloud.test();
+      testBtn.textContent = old;
+      testBtn.disabled = false;
+      if (r.ok) { toast('Sync endpoint works', { icon: 'check' }); cloud.start(); }
+      else toast(r.error, { error: true, ms: 7000 });
+      syncState.textContent = syncStatusText();
+    },
+  }, [icon('sync'), 'Test connection']);
+
+  const saveSync = () => {
+    setSetting('syncEndpoint', syncEp.value.trim());
+    setSetting('syncRoom', syncRoom.value.trim());
+    presence.failures = 0;
+    cloud.reset().then(() => { syncState.textContent = syncStatusText(); });
+  };
+  syncEp.addEventListener('change', saveSync);
+  syncRoom.addEventListener('change', saveSync);
+
+  root.append(group('Sync across devices', [
+    el('div.set-row', {}, [
+      el('div.grow', {}, [el('b', { text: 'Status' }), syncState]),
+      testBtn,
+    ]),
+    el('div.set-row', { style: { display: 'block' } }, [
+      el('div.field', { style: { margin: 0 } }, [
+        el('label', { text: 'Worker endpoint' }),
+        syncEp,
+        el('small', { html: 'Deploy <code>tools/aura-worker.js</code> to a free Cloudflare Worker — setup steps are in the file header. This one URL covers sync <em>and</em> the listener count.' }),
+      ]),
+    ]),
+    el('div.set-row', { style: { display: 'block' } }, [
+      el('div.field', { style: { margin: 0 } }, [
+        el('label', { text: 'Room key' }),
+        syncRoom,
+        el('small', { html: 'At least 8 characters, identical on every device. This is the <b>only</b> credential — anyone who knows it can read and write your playlists, so treat it like a password.' }),
+      ]),
+    ]),
+    toggleRow('Live Follow', 'follow the other device continuously instead of just offering to pick up where it left off — expect a second or two of drift', 'liveFollow', () => cloud.schedulePoll()),
+    el('div.set-row', {}, [
+      el('div.grow', {}, [el('b', { text: 'Sync now' }), el('small', { text: 'pull, merge, then push this device\u2019s copy' })]),
+      el('button.btn.sm', {
+        onclick: async () => {
+          if (!cloud.enabled) { toast('Add an endpoint and room key first', { error: true }); return; }
+          toast('Syncing…', { icon: 'sync', ms: 1400 });
+          await cloud.pull();
+          await cloud.push({ force: true });
+          syncState.textContent = syncStatusText();
+          toast('Synced', { icon: 'check' });
+        },
+      }, [icon('sync'), 'Sync']),
+    ]),
+    el('div.set-row', { style: { display: 'block' } }, [
+      el('small', { html:
+        '<b>What syncs:</b> playlists, favourites, moment marks, play counts, theme and EQ, plus the track and position you were on.<br>' +
+        '<b>What does not:</b> your audio files. Each device plays from its own <code>audio/</code> folder, so serve the same library (GitHub Pages does this for you) and everything lines up.<br>' +
+        'Merging is additive — two devices edited offline both keep their additions rather than one overwriting the other.' }),
     ]),
   ]));
 

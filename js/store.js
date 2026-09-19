@@ -46,6 +46,9 @@ export const DEFAULT_SETTINGS = {
   tabSync: false,
   presenceMode: 'auto',  // auto | local | remote | off
   presenceEndpoint: '',
+  syncEndpoint: '',      // tools/aura-worker.js deployed somewhere
+  syncRoom: '',          // shared secret; the same string on every device
+  liveFollow: false,     // follow the other device continuously, not just on offer
   scrollLyrics: true,
   confirmDelete: true,
   volume: 1,
@@ -122,7 +125,8 @@ export const isFavorite = (id) => state.favorites.has(id);
 
 /* ── playlists ────────────────────────────────────────────── */
 export function createPlaylist(name, trackIds = []) {
-  const pl = { id: uid('pl_'), name: name.trim() || 'Untitled', trackIds: [...trackIds], createdAt: Date.now() };
+  const now = Date.now();
+  const pl = { id: uid('pl_'), name: name.trim() || 'Untitled', trackIds: [...trackIds], createdAt: now, updatedAt: now };
   state.playlists.unshift(pl);
   persist.playlists();
   emit('playlists', state.playlists);
@@ -131,7 +135,7 @@ export function createPlaylist(name, trackIds = []) {
 export function updatePlaylist(id, patch) {
   const pl = state.playlists.find(p => p.id === id);
   if (!pl) return null;
-  Object.assign(pl, patch);
+  Object.assign(pl, patch, { updatedAt: Date.now() });
   persist.playlists();
   emit('playlists', state.playlists);
   return pl;
@@ -147,6 +151,7 @@ export function addToPlaylist(playlistId, trackIds) {
   const ids = [trackIds].flat();
   const fresh = ids.filter(id => !pl.trackIds.includes(id));
   pl.trackIds.push(...fresh);
+  pl.updatedAt = Date.now();
   persist.playlists();
   emit('playlists', state.playlists);
   return fresh.length;
@@ -155,6 +160,7 @@ export function removeFromPlaylist(playlistId, trackId) {
   const pl = state.playlists.find(p => p.id === playlistId);
   if (!pl) return;
   pl.trackIds = pl.trackIds.filter(t => t !== trackId);
+  pl.updatedAt = Date.now();
   persist.playlists();
   emit('playlists', state.playlists);
 }

@@ -88,7 +88,9 @@ export const presence = {
 
     this.channel?.postMessage({ type: 'ping', id: this.tabId });
 
-    const endpoint = (state.settings.presenceEndpoint || '').trim();
+    // one endpoint for everything: fall back to the sync worker's /presence
+    const sync = (state.settings.syncEndpoint || '').trim().replace(/\/+$/, '');
+    const endpoint = (state.settings.presenceEndpoint || '').trim() || (sync ? sync + '/presence' : '');
     const wantRemote = endpoint && state.settings.presenceMode !== 'local';
 
     if (wantRemote && this.failures < 4) {

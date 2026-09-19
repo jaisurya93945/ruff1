@@ -1,3 +1,13 @@
 {
-  "_readme": "Map a theme id to your own artwork. Example: \"sakura\": \"images/my-art/sakura.png\". Anything not listed here falls back to the bundled SVG next to this file. Ids: sakura, neon, yuki, ember, mint, violet, hikari, kurone, mono."
+  "_readme": [
+    "Point a theme at your own artwork. Two forms are accepted:",
+    "  \"sakura\": \"images/art/sakura.png\"",
+    "  \"neon\":   { \"src\": \"images/art/rin.jpg\", \"focus\": \"54% 22%\", \"fit\": \"cover\", \"scale\": 1.05 }",
+    "focus is the point kept in frame when cropping (CSS background-position).",
+    "fit is \"cover\" (fill, crop edges) or \"contain\" (whole image, letterboxed).",
+    "Ids: sakura, neon, yuki, ember, mint, violet, hikari, kurone, mono.",
+    "Anything not listed falls back to the bundled .svg next to this file.",
+    "You can also pick art in-app (theme picker, + on a card) — that is stored",
+    "on that device only. Listing it here makes it permanent for every device."
+  ]
 }

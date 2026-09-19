@@ -18,6 +18,7 @@ import {
 import {
   toast, modal, closeModal, modalOpen, confirm, WaveformView, LyricsView, trackRow, lazyImg, FALLBACK_ART, closeContext,
 } from './ui.js';
+import { cloud } from './cloud.js';
 import {
   setView, renderView, refreshCurrentView, openEQ, openVocal, openSpeed, openSleep,
   openVibeCard, openMoodDJ, openHelp, openMarks, applyLabToggle, stopMarkLoop,
@@ -82,6 +83,7 @@ async function start() {
   startVisualizers();
   presence.start();
   if (state.settings.tabSync) tabSync.start();
+  cloud.start();                     // no-op unless an endpoint + room key are set
 
   setView('home');
   renderPresence();
@@ -239,10 +241,44 @@ function wireChrome() {
   on('marks', paintMarks);
   on('notify', ({ text, icon: ico, error }) => toast(text, { icon: ico, error }));
   on('theme', () => { viz?.refreshColors(); wave?.draw(); if (state.view === 'home') renderView('home'); });
+  on('theme:art', () => { if (state.view === 'home') renderView('home'); });
   on('accent', () => { viz?.refreshColors(); wave?.draw(); });
   on('artcolor', (onFlag) => onFlag ? applyArtColor(state.current?.cover) : clearArtColor());
   on('bgviz', (onFlag) => { $('#bgViz').style.display = onFlag ? '' : 'none'; });
   on('sleep', paintSleep);
+
+  /* ── cross-device sync ─────────────────────────────── */
+  on('cloud:merged', () => {
+    refreshCurrentView();
+    paintLike();
+    paintMarks();
+    initThemes();                    // a synced theme/mode change lands here
+    toast('Synced from your other device', { icon: 'sync' });
+  });
+
+  on('cloud:handoff', ({ track, time, device, playing }) => {
+    // never hijack playback — offer it
+    toast(`${device}: ${track.title} at ${fmtTime(time)}`, {
+      icon: 'sync', ms: 9000,
+      action: {
+        label: 'Continue here',
+        run: () => {
+          const idx = state.tracks.indexOf(track);
+          player.setQueue(state.tracks, idx < 0 ? 0 : idx, { autoplay: playing });
+          setTimeout(() => player.seek(time), 420);
+        },
+      },
+    });
+  });
+
+  on('cloud:follow', ({ track, time, playing }) => {
+    const idx = state.tracks.indexOf(track);
+    if (idx < 0) return;
+    player.setQueue(state.tracks, idx, { autoplay: playing });
+    setTimeout(() => player.seek(time), 420);
+  });
+  on('cloud:seek', ({ time }) => engine.seek(time));
+  on('cloud:playstate', ({ playing }) => { playing ? engine.play() : engine.pause(); });
   on('sleep:done', () => toast('Sleep timer finished — good night', { icon: 'moon', ms: 4000 }));
   on('queue:end', () => toast('Queue finished', { icon: 'check' }));
   on('view', () => closeContext());

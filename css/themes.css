@@ -228,3 +228,19 @@
 .theme-card.is-on .tc-check{display:grid}
 .dock-section{margin-top:var(--s-6)}
 .dock-section h4{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--s-3)}
+
+/* per-card "use my own image" affordance */
+.tc-art-btn{
+  position:absolute;left:10px;top:10px;z-index:3;
+  width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  background:color-mix(in oklab,#000 55%,transparent);color:#fff;
+  border:1px solid rgb(255 255 255/.3);opacity:0;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  transition:opacity var(--t-fast),transform var(--t-fast),background var(--t-fast);
+}
+.tc-art-btn .ico{width:15px;height:15px}
+.theme-card:hover .tc-art-btn,.theme-card:focus-within .tc-art-btn{opacity:1}
+.tc-art-btn:hover{background:var(--accent);transform:scale(1.1)}
+@media (hover:none){.tc-art-btn{opacity:.9}}
+.theme-card.has-custom .tc-art-btn{opacity:.9;background:color-mix(in oklab,var(--accent) 80%,transparent)}
+.tc-art{transition:transform var(--t-slow) var(--ease)}
