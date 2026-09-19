@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 620" width="400" height="620" role="img" aria-label="Null, the mono theme portrait">
+<defs>
+  <linearGradient id="hair-mono" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#e6e6ee"/><stop offset=".55" stop-color="#b4b4c2"/><stop offset="1" stop-color="#7c7c8c"/>
+  </linearGradient>
+  <linearGradient id="hairF-mono" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#e6e6ee"/><stop offset="1" stop-color="#b4b4c2"/>
+  </linearGradient>
+  <linearGradient id="skin-mono" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f2e6df"/><stop offset="1" stop-color="#d3c7c0"/>
+  </linearGradient>
+  <linearGradient id="fit-mono" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#25252d"/><stop offset="1" stop-color="#3a3a46"/>
+  </linearGradient>
+  <radialGradient id="iris-mono" cx=".5" cy=".34" r=".72">
+    <stop offset="0" stop-color="#c8c8d6"/><stop offset=".62" stop-color="#c8c8d6"/><stop offset="1" stop-color="#3a3a46"/>
+  </radialGradient>
+  <radialGradient id="glow-mono" cx=".5" cy=".42" r=".6">
+    <stop offset="0" stop-color="#e6e6ee" stop-opacity=".55"/><stop offset="1" stop-color="#e6e6ee" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="face-mono">
+    <path d="M124 196c0-62 30-98 76-98s76 36 76 98c0 50-32 100-76 118-44-18-76-68-76-118Z"/>
+  </clipPath>
+</defs>
+
+<ellipse cx="200" cy="300" rx="200" ry="260" fill="url(#glow-mono)"/>
+
+<!-- hair, back layer -->
+<path d="M200 54C124 54 82 112 78 200c-3 62-8 124-12 170l52 10c2-52 6-104 10-150-8-66 12-110 72-126 60 16 80 60 72 126 4 46 8 98 10 150l52-10c-4-46-9-108-12-170-4-88-46-146-122-146Z M300 150c34 18 52 58 56 108 5 62-6 130-30 190-10 26-28 44-48 48l-16-42c16-6 28-20 34-40 18-56 24-116 18-166-4-38-14-68-34-84Z" fill="url(#hair-mono)"/>
+
+<!-- shoulders -->
+<path d="M200 322c-16 0-30 10-34 26-52 14-88 54-96 112-6 44-8 100-8 160h276c0-60-2-116-8-160-8-58-44-98-96-112-4-16-18-26-34-26Z" fill="url(#fit-mono)"/>
+<path d="M166 348c10 22 20 34 34 34s24-12 34-34l-16-8c-6 10-11 14-18 14s-12-4-18-14Z" fill="#e3d7d0"/>
+
+<!-- neck -->
+<path d="M176 268h48v54c0 12-10 20-24 20s-24-8-24-20Z" fill="#cec2bb"/>
+
+<!-- face -->
+<path d="M124 196c0-62 30-98 76-98s76 36 76 98c0 50-32 100-76 118-44-18-76-68-76-118Z" fill="url(#skin-mono)"/>
+<g clip-path="url(#face-mono)">
+  <ellipse cx="160" cy="246" rx="19" ry="9" fill="#ff8fa8" opacity=".3"/>
+  <ellipse cx="240" cy="246" rx="19" ry="9" fill="#ff8fa8" opacity=".3"/>
+</g>
+<ellipse cx="126" cy="214" rx="9" ry="14" transform="rotate(-14 126 214)" fill="#d9cdc6"/>
+<ellipse cx="274" cy="214" rx="9" ry="14" transform="rotate(14 274 214)" fill="#d9cdc6"/>
+
+<!-- eyes -->
+<g transform="translate(160 214) scale(1 1)">
+  <path d="M-25-6c3-13 14-20 25-20s22 7 25 20c2 18-10 32-25 32S-27 12-25-6Z" fill="#fffdfa"/>
+  <ellipse cx="0" cy="4" rx="17" ry="20" fill="url(#iris-mono)"/>
+  <ellipse cx="0" cy="5" rx="7.5" ry="10" fill="#1a1320" opacity=".9"/>
+  <circle cx="-6" cy="-5" r="5.6" fill="#fff" opacity=".95"/>
+  <circle cx="6" cy="11" r="3" fill="#fff" opacity=".6"/>
+  <path d="M-27-8c4-15 15-23 27-23s23 8 27 23" fill="none" stroke="#3a3a46" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M-27-8c-4-3-8-4-11-3" fill="none" stroke="#3a3a46" stroke-width="6" stroke-linecap="round"/>
+</g>
+<g transform="translate(240 214) scale(-1 1)">
+  <path d="M-25-6c3-13 14-20 25-20s22 7 25 20c2 18-10 32-25 32S-27 12-25-6Z" fill="#fffdfa"/>
+  <ellipse cx="0" cy="4" rx="17" ry="20" fill="url(#iris-mono)"/>
+  <ellipse cx="0" cy="5" rx="7.5" ry="10" fill="#1a1320" opacity=".9"/>
+  <circle cx="-6" cy="-5" r="5.6" fill="#fff" opacity=".95"/>
+  <circle cx="6" cy="11" r="3" fill="#fff" opacity=".6"/>
+  <path d="M-27-8c4-15 15-23 27-23s23 8 27 23" fill="none" stroke="#3a3a46" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M-27-8c-4-3-8-4-11-3" fill="none" stroke="#3a3a46" stroke-width="6" stroke-linecap="round"/>
+</g>
+
+<!-- brows -->
+<path d="M138 186c8-8 24-11 38-6" fill="none" stroke="#7c7c8c" stroke-width="5" stroke-linecap="round" opacity=".82"/>
+<path d="M262 186c-8-8-24-11-38-6" fill="none" stroke="#7c7c8c" stroke-width="5" stroke-linecap="round" opacity=".82"/>
+
+<!-- nose + mouth -->
+<path d="M200 244c3 4 6 6 9 7" fill="none" stroke="#a69a93" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+<path d="M188 274c5 7 19 7 24 0" fill="none" stroke="#c2606a" stroke-width="3.6" stroke-linecap="round"/>
+
+<!-- hair, front -->
+<path d="M110 180c-8 56-6 114 4 158l28-8c-10-44-12-102-4-154Z M290 180c8 56 6 114-4 158l-28-8c10-44 12-102 4-154Z" fill="url(#hairF-mono)"/>
+<path d="M108 190c-6-72 32-122 92-122s98 50 92 122c-10-20-24-34-42-42l-8 36-22-42c-14 12-34 18-56 14l-10 32-14-48c-16 12-30 30-32 50Z" fill="url(#hairF-mono)"/>
+<path d="M150 104c22-14 60-18 92-4" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".28"/>
+
+
+      <g transform="translate(286 150) rotate(-12)">
+        <rect x="-19" y="-5" width="38" height="10" rx="5" fill="#e6e6ee"/>
+        <circle cx="-19" cy="0" r="6.5" fill="#7c7c8c"/>
+      </g>
+</svg>

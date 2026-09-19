@@ -1,0 +1,3 @@
+{
+  "_readme": "Map a theme id to your own artwork. Example: \"sakura\": \"images/my-art/sakura.png\". Anything not listed here falls back to the bundled SVG next to this file. Ids: sakura, neon, yuki, ember, mint, violet, hikari, kurone, mono."
+}

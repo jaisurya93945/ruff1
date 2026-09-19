@@ -1,0 +1,25 @@
+{
+  "name": "AURA — Music Player",
+  "short_name": "AURA",
+  "description": "A private, offline-first music player with live visualisers, spatial audio and anime themes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#120810",
+  "theme_color": "#120810",
+  "categories": ["music", "entertainment"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "images/favi.png", "sizes": "any", "type": "image/png" }
+  ],
+  "shortcuts": [
+    { "name": "Shuffle everything", "url": "./?action=shuffle", "description": "Play the whole library at random" },
+    { "name": "Favourites", "url": "./?view=playlists", "description": "Jump to your favourites" }
+  ]
+}

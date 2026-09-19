@@ -1,61 +1,112 @@
-/* Service Worker – Hacker Playlist */
-const CACHE = 'hacker-playlist-v1';
-const STATIC = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/songs.json',
-  '/img/favi.png',
-  '/img/search.png',
-  '/img/play1.png',
-  '/img/pause1.png',
-  '/img/previous.png',
-  '/img/next.png',
-  '/img/shuffle.png',
-  '/img/arrow.png',
-  '/img/all.png',
-  '/img/hgf.jpg',
-  '/img/nadaniya.jpg',
-  '/img/jan.gif'
+/* ═══════════════════════════════════════════════════════════
+   AURA · service worker
+
+   App shell  → cache-first, refreshed in the background.
+   Audio      → network-first with range support, never cached
+                whole (files are large; the browser's own HTTP
+                cache handles re-listens better than we can).
+   Everything else → stale-while-revalidate.
+   ═══════════════════════════════════════════════════════════ */
+
+const VERSION = 'aura-v1';
+const SHELL = `${VERSION}-shell`;
+const RUNTIME = `${VERSION}-runtime`;
+
+const SHELL_FILES = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './css/core.css',
+  './css/themes.css',
+  './css/components.css',
+  './css/anim.css',
+  './js/main.js',
+  './js/util.js',
+  './js/store.js',
+  './js/db.js',
+  './js/engine.js',
+  './js/analysis.js',
+  './js/library.js',
+  './js/visualizer.js',
+  './js/themes.js',
+  './js/features.js',
+  './js/player.js',
+  './js/ui.js',
+  './js/views.js',
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(STATIC)).then(() => self.skipWaiting())
-  );
+const AUDIO_RE = /\.(mp3|m4a|aac|ogg|oga|opus|wav|flac|webm)(\?.*)?$/i;
+
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(SHELL);
+    // addAll is all-or-nothing; add individually so one 404 can't
+    // stop the whole worker from installing
+    await Promise.all(SHELL_FILES.map(url =>
+      cache.add(new Request(url, { cache: 'reload' })).catch(() => {})));
+    self.skipWaiting();
+  })());
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys
+      .filter(k => k.startsWith('aura-') && !k.startsWith(VERSION))
+      .map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
-self.addEventListener('fetch', e => {
-  /* Skip non-GET and chrome-extension etc */
-  if (e.request.method !== 'GET') return;
-  if (!e.request.url.startsWith('http')) return;
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') self.skipWaiting();
+});
 
-  /* Audio files: network-first (don't cache large MP3s to avoid quota) */
-  if (e.request.url.match(/\.(mp3|ogg|wav|aac|m4a)$/i)) {
-    e.respondWith(fetch(e.request).catch(() => new Response('', { status: 503 })));
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== location.origin) return;            // let CDNs and APIs through untouched
+  if (request.headers.has('range')) return;              // seeking audio — don't interfere
+  if (AUDIO_RE.test(url.pathname)) return;               // audio streams straight from the network
+
+  // navigations: serve the shell so deep links work offline
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request);
+        const cache = await caches.open(SHELL);
+        cache.put('./index.html', fresh.clone());
+        return fresh;
+      } catch {
+        return (await caches.match('./index.html')) || Response.error();
+      }
+    })());
     return;
   }
 
-  /* Everything else: cache-first */
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(res => {
-        if (res.ok && res.type !== 'opaque') {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      }).catch(() => caches.match('/index.html'));
-    })
-  );
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    const network = fetch(request).then(async (res) => {
+      if (res && res.status === 200 && res.type === 'basic') {
+        const cache = await caches.open(isShell(url) ? SHELL : RUNTIME);
+        cache.put(request, res.clone());
+        await trimCache(RUNTIME, 90);
+      }
+      return res;
+    }).catch(() => null);
+
+    return cached || (await network) || new Response('', { status: 504, statusText: 'Offline' });
+  })());
 });
+
+const isShell = (url) => SHELL_FILES.some(f => url.pathname.endsWith(f.replace('./', '/')));
+
+/** keep the runtime cache from growing without bound */
+async function trimCache(name, max) {
+  const cache = await caches.open(name);
+  const keys = await cache.keys();
+  if (keys.length <= max) return;
+  for (const key of keys.slice(0, keys.length - max)) await cache.delete(key);
+}

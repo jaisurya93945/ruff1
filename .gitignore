@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Uncomment if your music library outgrows Git:
+# audio/*.mp3
+# audio/*.flac
+# audio/*.m4a
+# audio/*.wav

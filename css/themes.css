@@ -1,0 +1,230 @@
+/* ═══════════════════════════════════════════════════════════
+   AURA · themes — 9 palettes, each with a dark + light mode.
+   Add your own: copy a block, change the 4 hues, register it
+   in js/themes.js.  Portrait art lives in images/themes/<id>.svg
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── shared dark scaffolding ──────────────────────────────── */
+[data-mode="dark"]{
+  --text:#f2edfa; --text-2:#bdb3d0; --text-3:#7d7590;
+  --art-op:.5; --aurora-op:.62; --art-blend:screen;
+  color-scheme:dark;
+}
+[data-mode="light"]{
+  --text:#171226; --text-2:#4a4160; --text-3:#837a97;
+  --art-op:.3; --aurora-op:.4; --art-blend:multiply;
+  color-scheme:light;
+}
+
+/* ═══ 1 · SAKURA DRIFT — petals, dusk, first-love pink ═════ */
+[data-theme="sakura"][data-mode="dark"]{
+  --bg-0:#120810; --bg-1:#1b0c18; --bg-2:#241023;
+  --bg-grad:radial-gradient(120% 90% at 20% 0%,#2a1024 0%,#160a14 48%,#0d0610 100%);
+  --surface:#251127; --surface-2:#2e1631; --stroke:#41214380; --stroke-2:#5a2f5c;
+  --accent:#ff7eb6; --accent-2:#ffa8d2; --accent-3:#b96cf0;
+  --accent-grad:linear-gradient(120deg,#ff7eb6,#ffa8d2 45%,#b96cf0);
+  --glow:#ff7eb6a0;
+}
+[data-theme="sakura"][data-mode="light"]{
+  --bg-0:#fff7fb; --bg-1:#ffeef6; --bg-2:#ffe3f0;
+  --bg-grad:radial-gradient(120% 90% at 20% 0%,#ffe6f3 0%,#fff6fb 55%,#fdf2ff 100%);
+  --surface:#ffffff; --surface-2:#fff2f8; --stroke:#f6cfe3; --stroke-2:#eeb4d2;
+  --accent:#e0468f; --accent-2:#f272b0; --accent-3:#8f4fd8;
+  --accent-grad:linear-gradient(120deg,#e0468f,#f272b0 45%,#8f4fd8);
+  --glow:#e0468f60;
+}
+
+/* ═══ 2 · CYBER RIN — rain-slick neon, chrome, midnight city ═ */
+[data-theme="neon"][data-mode="dark"]{
+  --bg-0:#04070e; --bg-1:#070d1a; --bg-2:#0b1424;
+  --bg-grad:radial-gradient(120% 90% at 78% 6%,#0d2137 0%,#06101f 50%,#03060c 100%);
+  --surface:#0d1727; --surface-2:#121e33; --stroke:#1e3a5c80; --stroke-2:#2a5480;
+  --accent:#28e6ff; --accent-2:#6af7d2; --accent-3:#ff3ea5;
+  --accent-grad:linear-gradient(120deg,#28e6ff,#6af7d2 45%,#ff3ea5);
+  --glow:#28e6ffa0;
+}
+[data-theme="neon"][data-mode="light"]{
+  --bg-0:#f3fbff; --bg-1:#e6f6ff; --bg-2:#d9f0fb;
+  --bg-grad:radial-gradient(120% 90% at 78% 6%,#dcf4ff 0%,#f2fbff 55%,#f7f4ff 100%);
+  --surface:#ffffff; --surface-2:#eef9ff; --stroke:#bfe4f5; --stroke-2:#96d2ec;
+  --accent:#0096b8; --accent-2:#12a98b; --accent-3:#d61a7c;
+  --accent-grad:linear-gradient(120deg,#0096b8,#12a98b 45%,#d61a7c);
+  --glow:#0096b860;
+}
+
+/* ═══ 3 · MIDNIGHT YUKI — snowfall, silver, quiet winter ═══ */
+[data-theme="yuki"][data-mode="dark"]{
+  --bg-0:#06090f; --bg-1:#0b1119; --bg-2:#111926;
+  --bg-grad:radial-gradient(120% 90% at 50% -6%,#16263c 0%,#0a121d 52%,#05080d 100%);
+  --surface:#111a28; --surface-2:#162232; --stroke:#25384f80; --stroke-2:#35506e;
+  --accent:#9ec5ff; --accent-2:#dbe9ff; --accent-3:#7f8dff;
+  --accent-grad:linear-gradient(120deg,#9ec5ff,#dbe9ff 45%,#7f8dff);
+  --glow:#9ec5ff90;
+}
+[data-theme="yuki"][data-mode="light"]{
+  --bg-0:#f7faff; --bg-1:#edf3fc; --bg-2:#e3ecf8;
+  --bg-grad:radial-gradient(120% 90% at 50% -6%,#e6eefb 0%,#f6f9ff 55%,#f2f5ff 100%);
+  --surface:#ffffff; --surface-2:#f2f6fd; --stroke:#d3e0f0; --stroke-2:#b4c8e2;
+  --accent:#3d6db5; --accent-2:#5e8ed0; --accent-3:#5a63cf;
+  --accent-grad:linear-gradient(120deg,#3d6db5,#5e8ed0 45%,#5a63cf);
+  --glow:#3d6db555;
+}
+
+/* ═══ 4 · EMBER HANA — sunset, forge-light, warm defiance ══ */
+[data-theme="ember"][data-mode="dark"]{
+  --bg-0:#100604; --bg-1:#1a0b06; --bg-2:#25120a;
+  --bg-grad:radial-gradient(120% 90% at 26% 4%,#3a1608 0%,#1a0a05 52%,#0c0503 100%);
+  --surface:#231009; --surface-2:#2d160d; --stroke:#4a231180; --stroke-2:#6b3418;
+  --accent:#ff8c42; --accent-2:#ffd166; --accent-3:#ff4d6d;
+  --accent-grad:linear-gradient(120deg,#ff8c42,#ffd166 45%,#ff4d6d);
+  --glow:#ff8c42a0;
+}
+[data-theme="ember"][data-mode="light"]{
+  --bg-0:#fffaf4; --bg-1:#fff2e4; --bg-2:#ffe9d5;
+  --bg-grad:radial-gradient(120% 90% at 26% 4%,#ffe9d2 0%,#fff8ef 55%,#fff5f2 100%);
+  --surface:#ffffff; --surface-2:#fff5ea; --stroke:#f7d9bd; --stroke-2:#eebf99;
+  --accent:#d1611a; --accent-2:#c98a06; --accent-3:#d62f50;
+  --accent-grad:linear-gradient(120deg,#d1611a,#c98a06 45%,#d62f50);
+  --glow:#d1611a60;
+}
+
+/* ═══ 5 · AOI MINT — sea glass, calm, summer uniform ═══════ */
+[data-theme="mint"][data-mode="dark"]{
+  --bg-0:#040d0c; --bg-1:#071614; --bg-2:#0b201d;
+  --bg-grad:radial-gradient(120% 90% at 68% 0%,#0b2a28 0%,#061513 50%,#030a09 100%);
+  --surface:#0b1e1c; --surface-2:#0f2926; --stroke:#1a423d80; --stroke-2:#256058;
+  --accent:#4fe0c0; --accent-2:#a6f5c9; --accent-3:#48b4ff;
+  --accent-grad:linear-gradient(120deg,#4fe0c0,#a6f5c9 45%,#48b4ff);
+  --glow:#4fe0c0a0;
+}
+[data-theme="mint"][data-mode="light"]{
+  --bg-0:#f4fffc; --bg-1:#e6fbf5; --bg-2:#d8f6ee;
+  --bg-grad:radial-gradient(120% 90% at 68% 0%,#dcf8f1 0%,#f3fffc 55%,#eefbff 100%);
+  --surface:#ffffff; --surface-2:#eefdf8; --stroke:#c2e9de; --stroke-2:#98d8c7;
+  --accent:#0a9e82; --accent-2:#2eae70; --accent-3:#1478c4;
+  --accent-grad:linear-gradient(120deg,#0a9e82,#2eae70 45%,#1478c4);
+  --glow:#0a9e8255;
+}
+
+/* ═══ 6 · VIOLET NOCTURNE — velvet, moonlight, gothic lace ═ */
+[data-theme="violet"][data-mode="dark"]{
+  --bg-0:#08060f; --bg-1:#0e0a1b; --bg-2:#150f28;
+  --bg-grad:radial-gradient(120% 90% at 36% -4%,#221542 0%,#100a20 52%,#06040c 100%);
+  --surface:#150f28; --surface-2:#1c1434; --stroke:#2e215480; --stroke-2:#443075;
+  --accent:#a78bfa; --accent-2:#e0c3fc; --accent-3:#5b8cff;
+  --accent-grad:linear-gradient(120deg,#a78bfa,#e0c3fc 45%,#5b8cff);
+  --glow:#a78bfaa0;
+}
+[data-theme="violet"][data-mode="light"]{
+  --bg-0:#faf8ff; --bg-1:#f2edff; --bg-2:#e9e2fd;
+  --bg-grad:radial-gradient(120% 90% at 36% -4%,#ebe3ff 0%,#f9f7ff 55%,#f4f2ff 100%);
+  --surface:#ffffff; --surface-2:#f6f2ff; --stroke:#ded3f7; --stroke-2:#c3b2ee;
+  --accent:#6d3fd4; --accent-2:#9457e0; --accent-3:#3a63d8;
+  --accent-grad:linear-gradient(120deg,#6d3fd4,#9457e0 45%,#3a63d8);
+  --glow:#6d3fd455;
+}
+
+/* ═══ 7 · SOLAR HIKARI — dawn, gold leaf, shrine bells ════ */
+[data-theme="hikari"][data-mode="dark"]{
+  --bg-0:#0e0b04; --bg-1:#161105; --bg-2:#201908;
+  --bg-grad:radial-gradient(120% 90% at 50% -2%,#33270a 0%,#171105 52%,#0a0803 100%);
+  --surface:#1d1607; --surface-2:#261d0b; --stroke:#44331280; --stroke-2:#5e4718;
+  --accent:#ffd84d; --accent-2:#fff3b0; --accent-3:#ff9e58;
+  --accent-grad:linear-gradient(120deg,#ffd84d,#fff3b0 45%,#ff9e58);
+  --glow:#ffd84da0;
+}
+[data-theme="hikari"][data-mode="light"]{
+  --bg-0:#fffdf3; --bg-1:#fff9e0; --bg-2:#fff4cc;
+  --bg-grad:radial-gradient(120% 90% at 50% -2%,#fff6d4 0%,#fffdf0 55%,#fff8ea 100%);
+  --surface:#ffffff; --surface-2:#fffbe9; --stroke:#f4e4b2; --stroke-2:#e6cd85;
+  --accent:#b8860b; --accent-2:#a8870f; --accent-3:#d2691e;
+  --accent-grad:linear-gradient(120deg,#b8860b,#c9970f 45%,#d2691e);
+  --glow:#b8860b55;
+}
+
+/* ═══ 8 · ABYSS KURONE — void, toxic bloom, after hours ═══ */
+[data-theme="kurone"][data-mode="dark"]{
+  --bg-0:#030405; --bg-1:#070a0b; --bg-2:#0c1113;
+  --bg-grad:radial-gradient(120% 90% at 50% 100%,#0c1f18 0%,#06090a 52%,#020304 100%);
+  --surface:#0b1012; --surface-2:#101719; --stroke:#1c292b80; --stroke-2:#2a3e3f;
+  --accent:#8fff6b; --accent-2:#d4ff8f; --accent-3:#00e0c6;
+  --accent-grad:linear-gradient(120deg,#8fff6b,#d4ff8f 45%,#00e0c6);
+  --glow:#8fff6b90;
+}
+[data-theme="kurone"][data-mode="light"]{
+  --bg-0:#f6faf5; --bg-1:#ecf5ea; --bg-2:#e1efde;
+  --bg-grad:radial-gradient(120% 90% at 50% 100%,#e4f3e6 0%,#f5faf4 55%,#f0fbf8 100%);
+  --surface:#ffffff; --surface-2:#f2f9f1; --stroke:#cfe4cb; --stroke-2:#a9cfa3;
+  --accent:#3f8f22; --accent-2:#6b9412; --accent-3:#048c7c;
+  --accent-grad:linear-gradient(120deg,#3f8f22,#6b9412 45%,#048c7c);
+  --glow:#3f8f2255;
+}
+
+/* ═══ 9 · MONOCHROME — no distractions, just the waveform ══ */
+[data-theme="mono"][data-mode="dark"]{
+  --bg-0:#08080a; --bg-1:#0e0e11; --bg-2:#151519;
+  --bg-grad:radial-gradient(120% 90% at 50% 0%,#1a1a1f 0%,#0d0d10 52%,#070708 100%);
+  --surface:#15151a; --surface-2:#1c1c22; --stroke:#2a2a3280; --stroke-2:#3c3c47;
+  --accent:#e8e8ef; --accent-2:#ffffff; --accent-3:#9a9aab;
+  --accent-grad:linear-gradient(120deg,#e8e8ef,#ffffff 45%,#9a9aab);
+  --glow:#ffffff55; --aurora-op:.22;
+}
+[data-theme="mono"][data-mode="light"]{
+  --bg-0:#fbfbfc; --bg-1:#f3f3f5; --bg-2:#eaeaee;
+  --bg-grad:radial-gradient(120% 90% at 50% 0%,#eeeef1 0%,#fafafb 55%,#f5f5f7 100%);
+  --surface:#ffffff; --surface-2:#f5f5f8; --stroke:#e0e0e6; --stroke-2:#c6c6d0;
+  --accent:#2a2a33; --accent-2:#4b4b58; --accent-3:#7a7a8a;
+  --accent-grad:linear-gradient(120deg,#2a2a33,#4b4b58 45%,#7a7a8a);
+  --glow:#2a2a3340; --aurora-op:.18;
+}
+
+/* ── "auto" accent: pulled live from the album art ────────── */
+[data-artcolor="on"]{
+  --accent:var(--art-accent,#ff7eb6);
+  --accent-2:var(--art-accent-2,#ffa8d2);
+  --accent-3:var(--art-accent-3,#b96cf0);
+  --accent-grad:linear-gradient(120deg,var(--art-accent),var(--art-accent-2) 45%,var(--art-accent-3));
+  --glow:color-mix(in oklab,var(--art-accent) 62%,transparent);
+}
+
+/* ── theme dock (palette picker overlay) ──────────────────── */
+#themeDock{
+  position:fixed;inset:0;z-index:var(--z-dock);display:grid;place-items:end center;
+  background:color-mix(in oklab,var(--bg-0) 55%,transparent);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  padding:var(--s-4);animation:fade .22s var(--ease);
+}
+.dock-panel{
+  width:min(980px,100%);max-height:min(82dvh,760px);overflow:auto;
+  padding:var(--s-6);animation:slideUp .34s var(--ease);
+  background:var(--pane-bg);border:var(--pane-border);box-shadow:var(--pane-shadow);
+  -webkit-backdrop-filter:var(--pane-blur);backdrop-filter:var(--pane-blur);
+  border-radius:var(--r-2xl) var(--r-2xl) var(--r-lg) var(--r-lg);
+}
+.dock-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s-5)}
+.dock-head h3{font-size:20px;font-weight:700}
+.dock-head p{font-size:13px;color:var(--text-3);margin-top:2px}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:var(--s-4)}
+.theme-card{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;
+  border:2px solid var(--stroke);aspect-ratio:3/3.6;
+  transition:transform var(--t) var(--spring),border-color var(--t),box-shadow var(--t);
+  text-align:left;
+}
+.theme-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 22px 44px -18px rgb(0 0 0/.6)}
+.theme-card.is-on{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab,var(--accent) 22%,transparent),0 20px 44px -18px var(--glow)}
+.tc-art{position:absolute;inset:0;background-size:cover;background-position:center top}
+.tc-wash{position:absolute;inset:0}
+.tc-body{position:absolute;left:0;right:0;bottom:0;padding:var(--s-6) var(--s-4) var(--s-4);color:#fff;z-index:2;
+  background:linear-gradient(transparent,rgb(0 0 0/.5) 34%,rgb(0 0 0/.9))}
+.tc-name{font-weight:700;font-size:15px;text-shadow:0 2px 10px rgb(0 0 0/.7)}
+.tc-tag{font-size:11px;opacity:.85;text-shadow:0 2px 8px rgb(0 0 0/.7)}
+.tc-swatches{display:flex;gap:5px;margin-top:8px}
+.tc-swatches i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1.5px rgb(255 255 255/.5)}
+.tc-check{
+  position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;z-index:3;
+  display:none;place-items:center;background:var(--accent);color:var(--bg-0);
+}
+.theme-card.is-on .tc-check{display:grid}
+.dock-section{margin-top:var(--s-6)}
+.dock-section h4{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--s-3)}
