@@ -674,12 +674,33 @@ function wireKeyboard() {
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol === 'file:') return;
-  navigator.serviceWorker.register('sw.js').then(reg => {
+
+  /* A page rendered before a new worker took over is running the previous
+     release's JavaScript. Refresh it — but never mid-song: interrupting
+     playback to apply a cosmetic update is a worse bug than the stale code.
+     The session flag stops a worker that keeps re-activating from looping. */
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data?.type !== 'aura:updated') return;
+    if (sessionStorage.getItem('aura:reloaded') === e.data.version) return;
+    try { sessionStorage.setItem('aura:reloaded', e.data.version); } catch {}
+
+    if (state.playing) {
+      toast('An update is ready', {
+        icon: 'download', ms: 12000,
+        action: { label: 'Reload', run: () => location.reload() },
+      });
+    } else {
+      location.reload();
+    }
+  });
+
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    reg.update().catch(() => {});
     reg.addEventListener('updatefound', () => {
       const sw = reg.installing;
       sw?.addEventListener('statechange', () => {
         if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-          toast('A new version is ready', { icon: 'download', ms: 7000, action: { label: 'Reload', run: () => location.reload() } });
+          toast('Updating to the latest version…', { icon: 'download', ms: 4000 });
         }
       });
     });
