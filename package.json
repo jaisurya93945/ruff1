@@ -8,7 +8,7 @@
     "dev": "node tools/serve.mjs",
     "start": "node tools/serve.mjs",
     "manifest": "node tools/build-manifest.mjs",
-    "portraits": "node tools/gen-portraits.mjs",
+    "art": "node tools/prep-art.mjs && node tools/gen-themes.mjs",
     "icons": "node tools/gen-icons.mjs"
   },
   "engines": { "node": ">=18" },

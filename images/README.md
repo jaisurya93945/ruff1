@@ -17,41 +17,38 @@ audio/husn.mp3   →   images/husn.jpg
 
 Embedded ID3 artwork wins over this; a filename match is the fallback.
 
-### Using your own theme art
+### Character artwork
 
-The bundled portraits are simple generated vectors — deliberately plain,
-because they are code, not drawings. Replace them with real artwork any of
-three ways, checked in this order:
+`chars/` holds the themes. For each character:
 
-**1 — In the app (fastest, per device).** Open the theme picker, hover any
-card, tap the **+**. The image is stored in that browser's IndexedDB. Nothing
-is uploaded anywhere. You can do this from your phone. Tapping the character
-on the home screen does the same thing.
+| file | what |
+|---|---|
+| `<id>-src.png` | your original, any size |
+| `<id>.webp` | generated full-bleed backdrop |
+| `<id>-card.webp` | generated theme-picker portrait |
+| `palettes.json` | generated palettes + blurred placeholders |
 
-**2 — `overrides.json` (permanent, every device).** Commit your images and
-list them:
+Only `-src` files are yours to edit. Everything else is rebuilt by
+`npm run art`, so do not hand-edit it.
+
+**Add one:** drop `images/chars/<id>-src.png`, add a row to `CHARACTERS` in
+`tools/gen-themes.mjs`, run `npm run art`.
+
+Portraits work best tall (2:3 or 3:4) with the subject's head in the upper
+third — the backdrop anchors bottom-right on a desktop and crops from the top
+on a phone.
+
+### Using a different image for one theme
+
+Either overwrite that character's `-src` file and re-run `npm run art`, or
+point at any path in `themes/overrides.json`:
 
 ```json
-{
-  "sakura": "images/art/sakura.png",
-  "neon":   { "src": "images/art/rin.jpg", "focus": "54% 22%", "fit": "cover", "scale": 1.05 }
-}
+{ "aoi": { "src": "images/art/aoi.png", "focus": "50% 14%", "fit": "cover" } }
 ```
 
-| key | meaning |
-|---|---|
-| `src` | path to the image |
-| `focus` | point kept in frame when cropped (CSS `background-position`) — e.g. `"50% 20%"` to favour the face |
-| `fit` | `cover` fills and crops, `contain` shows the whole image |
-| `scale` | slight zoom, e.g. `1.08` |
+Or, fastest: tap **+** on a theme card in the app. That stores the image in
+the browser on that device only — nothing is uploaded, and it works from a
+phone.
 
-**3 — overwrite the SVG.** Drop your own `images/themes/sakura.svg` in place.
-
-Ids: `sakura` `neon` `yuki` `ember` `mint` `violet` `hikari` `kurone` `mono`
-
-Real artwork looks best tall (roughly 2:3 or 3:4) with the subject's head in
-the upper third — the hero fades the left and bottom edges into the panel,
-and the theme cards crop toward `focus`.
-
-> Only use art you have the right to use. Nothing in this repo is copied from
-> anywhere; if you add someone else's artwork, that's on you to clear.
+> Only use art you have the right to use. Anything you add is yours to clear.

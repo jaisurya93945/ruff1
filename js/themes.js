@@ -6,21 +6,22 @@ import { $, el, icon, ls } from './util.js';
 import { state, setSetting, emit } from './store.js';
 import { extractColors } from './analysis.js';
 import { blobs } from './db.js';
+import { CHARACTERS } from './characters.js';
 
 /** Each entry maps to a [data-theme] block in css/themes.css.
  *  `art` is a portrait in images/themes/ — drop your own
  *  <id>.png / .jpg / .webp there and it wins over the SVG. */
 export const THEMES = [
-  { id:'sakura', name:'Sakura Drift',    who:'Sakura',   tag:'petals & dusk',       swatch:['#ff7eb6','#ffa8d2','#b96cf0'] },
-  { id:'neon',   name:'Cyber Rin',       who:'Rin',      tag:'rain-slick neon',     swatch:['#28e6ff','#6af7d2','#ff3ea5'] },
-  { id:'yuki',   name:'Midnight Yuki',   who:'Yuki',     tag:'snowfall & silver',   swatch:['#9ec5ff','#dbe9ff','#7f8dff'] },
-  { id:'ember',  name:'Ember Hana',      who:'Hana',     tag:'forge-light',         swatch:['#ff8c42','#ffd166','#ff4d6d'] },
-  { id:'mint',   name:'Aoi Mint',        who:'Aoi',      tag:'sea glass',           swatch:['#4fe0c0','#a6f5c9','#48b4ff'] },
-  { id:'violet', name:'Violet Nocturne', who:'Nocturne', tag:'velvet & moonlight',  swatch:['#a78bfa','#e0c3fc','#5b8cff'] },
-  { id:'hikari', name:'Solar Hikari',    who:'Hikari',   tag:'dawn & gold leaf',    swatch:['#ffd84d','#fff3b0','#ff9e58'] },
-  { id:'kurone', name:'Abyss Kurone',    who:'Kurone',   tag:'void & toxic bloom',  swatch:['#8fff6b','#d4ff8f','#00e0c6'] },
-  { id:'mono',   name:'Monochrome',      who:'Null',     tag:'no distractions',     swatch:['#e8e8ef','#ffffff','#9a9aab'] },
+  ...CHARACTERS.map(c => ({
+    id: c.id, name: c.name, who: c.name, tag: c.tag, blurb: c.blurb,
+    swatch: c.palette, lqip: c.lqip, size: c.size, hasArt: true,
+  })),
+  { id: 'mono', name: 'Null', who: 'Null', tag: 'no distractions',
+    blurb: 'artwork off, nothing between you and the waveform',
+    swatch: ['#e8e8ef', '#ffffff', '#9a9aab'], hasArt: false },
 ];
+
+export const themeById = (id) => THEMES.find(t => t.id === id) || THEMES[0];
 
 export const MORPHS = [
   { id:'glass',  name:'Glass',     hint:'frosted, translucent panels' },
@@ -34,10 +35,11 @@ const artCache = new Map();
 
 /* ── apply ────────────────────────────────────────────────── */
 export function applyTheme(id) {
-  const theme = THEMES.find(t => t.id === id) ? id : 'sakura';
+  const theme = THEMES.some(t => t.id === id) ? id : THEMES[0].id;
   root.dataset.theme = theme;
   setSetting('theme', theme);
   syncMetaColor();
+  paintBackdrop(theme);
   emit('theme', { theme });
 }
 export function applyMode(mode) {
@@ -79,6 +81,8 @@ function syncMetaColor() {
 /** restore everything on boot */
 export function initThemes() {
   const s = state.settings;
+  // the theme list changed when the characters arrived; drop stale ids
+  if (!THEMES.some(t => t.id === s.theme)) s.theme = THEMES[0].id;
   root.dataset.theme = s.theme;
   root.dataset.mode = s.mode;
   root.dataset.morph = s.morph;
@@ -89,94 +93,82 @@ export function initThemes() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Portrait resolution
+   Artwork resolution
 
    Three sources, best first:
      1. art you picked in-app        → IndexedDB, per device
      2. images/themes/overrides.json → committed to the repo
-     3. images/themes/<id>.svg       → the bundled fallback
+     3. images/chars/<id>.webp       → the bundled character
 
-   (1) means you can set artwork from your phone without
-   touching the repository at all. (2) is how you make it
-   permanent for every device.
-
-   overrides.json accepts either a bare path or an object, so
-   you can tune how a real image is framed:
-
-     {
-       "sakura": "images/art/sakura.png",
-       "neon":   { "src": "images/art/rin.jpg",
-                   "focus": "54% 22%",   // what to keep in frame
-                   "fit": "cover",       // cover | contain
-                   "scale": 1.08 }
-     }
+   (1) works from a phone without touching the repository.
    ═══════════════════════════════════════════════════════════ */
 
-const DEFAULT_ART = { focus: '50% 18%', fit: 'contain', scale: 1 };
+const DEFAULT_ART = { focus: '50% 14%', fit: 'cover', scale: 1 };
 
 let overridesPromise = null;
 function loadOverrides() {
   overridesPromise ??= fetch('images/themes/overrides.json', { cache: 'no-cache' })
     .then(r => (r.ok ? r.json() : {}))
-    .then(map => (map && typeof map === 'object' ? map : {}))
+    .then(m => (m && typeof m === 'object' ? m : {}))
     .catch(() => ({}));
   return overridesPromise;
 }
 
-function normalise(entry, fallbackSrc) {
-  if (typeof entry === 'string' && entry.trim()) return { ...DEFAULT_ART, src: entry.trim(), fit: 'cover' };
+function normalise(entry, fallback) {
+  if (typeof entry === 'string' && entry.trim()) return { ...DEFAULT_ART, backdrop: entry.trim(), card: entry.trim() };
   if (entry && typeof entry === 'object' && entry.src) {
-    return { ...DEFAULT_ART, fit: 'cover', ...entry, src: String(entry.src) };
+    return { ...DEFAULT_ART, ...entry, backdrop: String(entry.src), card: String(entry.card || entry.src) };
   }
-  return { ...DEFAULT_ART, src: fallbackSrc };
+  return fallback;
 }
 
-/** @returns {Promise<{src,focus,fit,scale,custom:boolean}>} */
-export async function portraitArt(themeId) {
+/** @returns {Promise<{backdrop,card,lqip,focus,fit,scale,custom,none}>} */
+export async function themeArt(themeId) {
   if (artCache.has(themeId)) return artCache.get(themeId);
 
   const resolved = (async () => {
-    // 1 — art the user picked in this browser
     try {
       const rec = await customArt.get(themeId);
       if (rec?.blob) {
-        return { ...DEFAULT_ART, fit: 'cover', ...(rec.tune || {}), src: URL.createObjectURL(rec.blob), custom: true };
+        const url = URL.createObjectURL(rec.blob);
+        return { ...DEFAULT_ART, ...(rec.tune || {}), backdrop: url, card: url, lqip: '', custom: true };
       }
     } catch {}
 
-    // 2 — committed overrides, 3 — bundled SVG
+    const meta = themeById(themeId);
+    const bundled = meta.hasArt
+      ? { ...DEFAULT_ART, backdrop: `images/chars/${themeId}.webp`, card: `images/chars/${themeId}-card.webp`, lqip: meta.lqip || '' }
+      : { ...DEFAULT_ART, backdrop: '', card: '', lqip: '', none: true };
+
     const map = await loadOverrides();
-    return { ...normalise(map[themeId], `images/themes/${themeId}.svg`), custom: false };
+    return { ...normalise(map[themeId], bundled), custom: false };
   })();
 
   artCache.set(themeId, resolved);
   return resolved;
 }
 
-/** back-compat: callers that only need a URL */
-export async function portraitURL(themeId) {
-  return (await portraitArt(themeId)).src;
-}
+/* back-compat for callers that only want one URL */
+export const portraitArt = themeArt;
+export async function portraitURL(themeId) { return (await themeArt(themeId)).card; }
 
-/** apply an art record to any element as a background */
-export function paintArt(node, art) {
+/** apply an art record to an element as a background */
+export function paintArt(node, art, which = 'card') {
   if (!node || !art) return;
-  node.style.backgroundImage = `url("${art.src}")`;
+  const src = art[which] || art.card || art.backdrop;
+  node.style.backgroundImage = src ? `url("${src}")` : 'none';
   node.style.backgroundSize = art.fit === 'contain' ? 'contain' : 'cover';
-  node.style.backgroundPosition = art.focus || '50% 18%';
+  node.style.backgroundPosition = art.focus || '50% 14%';
   node.style.backgroundRepeat = 'no-repeat';
-  if (art.scale && art.scale !== 1) {
-    node.style.transform = `scale(${art.scale})`;
-    node.style.transformOrigin = art.focus || 'center top';
-  } else {
-    node.style.transform = '';
-  }
+  node.style.transform = art.scale && art.scale !== 1 ? `scale(${art.scale})` : '';
 }
 
 /* ── per-device custom art, stored as blobs in IndexedDB ──── */
 export const customArt = {
   key: (id) => 'art:' + id,
-  get(id)       { return blobs.get(this.key(id)).then(v => (v && v.blob ? v : v ? { blob: v } : null)); },
+  get(id) {
+    return blobs.get(this.key(id)).then(v => (v && v.blob ? v : v ? { blob: v } : null));
+  },
   async set(id, file, tune = {}) {
     if (!(file instanceof Blob)) return false;
     if (file.size > 12 * 1024 * 1024) throw new Error('That image is over 12 MB — resize it first.');
@@ -192,6 +184,81 @@ export const customArt = {
   },
   async has(id) { return !!(await this.get(id)); },
 };
+
+/* ═══════════════════════════════════════════════════════════
+   The full-bleed backdrop
+   The low-res placeholder is inlined in the registry, so the
+   character is on screen the moment the CSS parses; the real
+   image fades over it once decoded.
+   ═══════════════════════════════════════════════════════════ */
+let backdropToken = 0;
+
+export async function paintBackdrop(themeId = state.settings.theme) {
+  const lq = document.getElementById('bgCharLq');
+  const hi = document.getElementById('bgCharHi');
+  const host = document.getElementById('bgChar');
+  if (!host) return;
+
+  const token = ++backdropToken;
+  const art = await themeArt(themeId);
+  if (token !== backdropToken) return;
+
+  if (art.none || !art.backdrop) {
+    host.classList.remove('on');
+    hi.style.backgroundImage = 'none';
+    lq.style.backgroundImage = 'none';
+    return;
+  }
+
+  host.classList.add('on');
+  host.style.setProperty('--art-focus', art.focus || '50% 14%');
+  const meta = themeById(themeId);
+  if (meta?.size?.w && meta?.size?.h) {
+    host.style.setProperty('--art-ar', (meta.size.w / meta.size.h).toFixed(3));
+  }
+
+  if (art.lqip) { lq.style.backgroundImage = `url("${art.lqip}")`; lq.style.opacity = '1'; }
+  else lq.style.opacity = '0';
+
+  hi.classList.remove('ready');
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    if (token !== backdropToken) return;
+    hi.style.backgroundImage = `url("${art.backdrop}")`;
+    requestAnimationFrame(() => hi.classList.add('ready'));
+  };
+  img.onerror = () => { if (token === backdropToken) lq.style.opacity = '1'; };
+  img.src = art.backdrop;
+}
+
+/* ── parallax: a few pixels of drift, nothing seasick ────── */
+export function initParallax() {
+  const host = document.getElementById('bgChar');
+  if (!host || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+  const step = () => {
+    cx += (tx - cx) * 0.08;
+    cy += (ty - cy) * 0.08;
+    host.style.setProperty('--px', cx.toFixed(2) + 'px');
+    host.style.setProperty('--py', cy.toFixed(2) + 'px');
+    raf = Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1 ? requestAnimationFrame(step) : 0;
+  };
+  const kick = () => { if (!raf && state.settings.motion !== false) raf = requestAnimationFrame(step); };
+
+  if (matchMedia('(hover:hover)').matches) {
+    window.addEventListener('pointermove', (e) => {
+      tx = (e.clientX / innerWidth - 0.5) * -26;
+      ty = (e.clientY / innerHeight - 0.5) * -16;
+      kick();
+    }, { passive: true });
+  }
+  document.getElementById('views')?.addEventListener('scroll', (e) => {
+    ty = -Math.min(e.target.scrollTop * 0.04, 40);
+    kick();
+  }, { passive: true, capture: true });
+}
 
 /* ── accent pulled live from the album art ────────────────── */
 let lastArtSrc = null;
@@ -240,7 +307,7 @@ export function openThemeDock() {
   panel.append(el('div.dock-head', {}, [
     el('div', {}, [
       el('h3', { text: 'Pick a mood' }),
-      el('p', { text: 'Nine palettes, four surface styles. Everything recolours instantly.' }),
+      el('p', { text: 'Every palette is read out of the artwork. Four surface styles. Recolours instantly.' }),
     ]),
     el('button.icon-btn', { onclick: closeThemeDock, 'aria-label': 'Close' }, [icon('close')]),
   ]));
@@ -257,9 +324,11 @@ export function openThemeDock() {
       },
     });
     const art = el('div.tc-art');
-    const paint = () => portraitArt(t.id).then(a => {
-      paintArt(art, a);
+    const paint = () => themeArt(t.id).then(a => {
+      if (a.lqip) art.style.backgroundImage = `url("${a.lqip}")`;
+      paintArt(art, a, 'card');
       card.classList.toggle('has-custom', !!a.custom);
+      card.classList.toggle('no-art', !!a.none);
     });
     paint();
 
@@ -269,7 +338,7 @@ export function openThemeDock() {
       el('div.tc-check', {}, [icon('check')]),
       el('div.tc-body', {}, [
         el('div.tc-name', { text: t.name }),
-        el('div.tc-tag', { text: t.tag }),
+        el('div.tc-tag', { text: t.blurb || t.tag }),
         el('div.tc-swatches', {}, t.swatch.map(c => el('i', { style: { background: c } }))),
       ]),
       el('button.tc-art-btn', {
@@ -325,7 +394,7 @@ export function openThemeDock() {
   panel.append(el('div.dock-section', {}, [
     el('h4', { text: 'Artwork' }),
     el('p', { style: { fontSize: '12.5px', color: 'var(--text-3)', lineHeight: '1.6', marginBottom: '10px' },
-      html: 'The bundled portraits are simple generated vectors. Tap <b>+</b> on any card to use your own image instead — it is stored on this device only, so nothing is uploaded anywhere. To make it permanent across every device, drop the files in <code>images/themes/</code> and list them in <code>overrides.json</code>.' }),
+      html: 'Tap <b>+</b> on any card to swap in your own image — stored on this device only, nothing is uploaded. To make it permanent everywhere, drop a file in <code>images/chars/</code> as <code>&lt;id&gt;-src.png</code> and run <code>npm run art</code>; the palette rebuilds itself from the new artwork.' }),
     el('div.preset-row', {}, [
       el('button.chip', { onclick: async () => { await clearAllArt(); closeThemeDock(); openThemeDock(); } }, [icon('trash'), 'Reset to bundled art']),
     ]),

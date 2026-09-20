@@ -10,7 +10,7 @@ import {
 import { engine, EQ_PRESETS } from './engine.js';
 import { player, beat } from './player.js';
 import { loadManifest, importFiles, rehydrateLocal, pruneMissing, makeTrack } from './library.js';
-import { initThemes, applyArtColor, clearArtColor, openThemeDock, closeThemeDock, THEMES } from './themes.js';
+import { initThemes, applyArtColor, clearArtColor, openThemeDock, closeThemeDock, THEMES, paintBackdrop, initParallax } from './themes.js';
 import { Visualizer, CoverRing, VIZ_MODES } from './visualizer.js';
 import {
   presence, renderPresence, sleep as sleepTimer, tabSync, wakeLock, echoHeat,
@@ -44,6 +44,8 @@ async function start() {
   const paired = consumePairingLink(setSetting);
 
   initThemes();
+  paintBackdrop();          // placeholder is inline, so this paints immediately
+  initParallax();
   engine.init();
 
   /* restore audio settings */

@@ -11,7 +11,7 @@ import {
 import { player } from './player.js';
 import { engine, EQ_BANDS, EQ_PRESETS } from './engine.js';
 import { SORTS, groupBy, importFiles, pickFolder, makeTrack } from './library.js';
-import { THEMES, MORPHS, applyTheme, applyMode, applyMorph, applyMotion, applyPerf, openThemeDock, portraitArt, paintArt, pickArtFor } from './themes.js';
+import { THEMES, MORPHS, themeById, applyTheme, applyMode, applyMorph, applyMotion, applyPerf, openThemeDock, themeArt, paintArt, pickArtFor } from './themes.js';
 import {
   toast, modal, sheet, closeModal, confirm, contextMenu, lazyImg, trackRow, emptyState,
   stagger, sectionHead, statTile, registerDialogs, FALLBACK_ART,
@@ -50,22 +50,17 @@ RENDERERS.home = (root) => {
 
   /* ── hero ── */
   const hero = el('div.hero');
-  const waifu = el('div.hero-waifu', {
-    title: 'Tap to use your own artwork',
-    onclick: () => pickArtFor(theme, async () => {
-      paintArt(waifu, await portraitArt(theme.id));
-    }),
-  });
-  portraitArt(theme.id).then(a => {
-    paintArt(waifu, a);
-    // generated vectors want the full figure; a real photo wants to fill the slot
-    waifu.classList.toggle('is-photo', !!a.custom || a.fit === 'cover');
-  });
-  hero.append(waifu);
+
+  /* who is on shift — the full-bleed backdrop is already showing her,
+     so this is just the label, and a shortcut into the picker */
+  const chip = el('button.char-chip', { onclick: openThemeDock, title: 'Change theme' });
+  const avatar = el('span.avatar');
+  chip.append(avatar, el('span', {}, [el('b', { text: theme.who }), el('span.tag', { text: ' · ' + theme.tag })]), el('span.dot'));
+  themeArt(theme.id).then(a => { if (a.card) avatar.style.backgroundImage = `url("${a.card}")`; });
 
   const totalMs = Object.values(state.stats).reduce((a, s) => a + (s.ms || 0), 0);
   hero.append(
-    el('div.hero-greet', {}, [icon('aura'), `${greet} — ${theme.who} is on shift`]),
+    el('div.hero-greet', {}, [icon('aura'), greet, chip]),
     el('h1', { html: state.tracks.length
       ? `Your library, <em>${state.tracks.length}</em> ${state.tracks.length === 1 ? 'track' : 'tracks'} deep.`
       : `Nothing here yet.<br><em>Let's fix that.</em>` }),
@@ -1394,6 +1389,7 @@ export function openHelp() {
 export function setView(name) {
   if (!view(name)) return;
   set({ view: name }, 'view');
+  document.body.dataset.view = name;     // the backdrop gives home more room
   $$('.view').forEach(v => v.classList.toggle('is-on', v.dataset.view === name));
   $$('.rail-btn[data-view]').forEach(b => b.classList.toggle('is-on', b.dataset.view === name));
   $$('.mnav-btn[data-view]').forEach(b => b.classList.toggle('is-on', b.dataset.view === name));

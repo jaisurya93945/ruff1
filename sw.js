@@ -8,7 +8,7 @@
    Everything else → stale-while-revalidate.
    ═══════════════════════════════════════════════════════════ */
 
-const VERSION = 'aura-v1';
+const VERSION = 'aura-v2';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -18,6 +18,8 @@ const SHELL_FILES = [
   './manifest.webmanifest',
   './css/core.css',
   './css/themes.css',
+  './css/chars.css',
+  './css/backdrop.css',
   './css/components.css',
   './css/anim.css',
   './js/main.js',
@@ -33,6 +35,9 @@ const SHELL_FILES = [
   './js/player.js',
   './js/ui.js',
   './js/views.js',
+  './js/cloud.js',
+  './js/eqgraph.js',
+  './js/characters.js',
 ];
 
 const AUDIO_RE = /\.(mp3|m4a|aac|ogg|oga|opus|wav|flac|webm)(\?.*)?$/i;
