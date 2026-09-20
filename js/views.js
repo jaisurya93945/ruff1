@@ -22,6 +22,7 @@ import {
 } from './features.js';
 import { arcPreset } from './analysis.js';
 import { cloud, generateRoomKey, pairingLink } from './cloud.js';
+import { EQGraph } from './eqgraph.js';
 import { usage, persistStorage, nuke } from './db.js';
 
 const view = (name) => $(`.view[data-view="${name}"]`);
@@ -77,7 +78,7 @@ RENDERERS.home = (root) => {
       }, [icon('shuffle'), 'Shuffle everything']),
       state.tracks.length && el('button.btn', { onclick: openMoodDJ }, [icon('wand'), 'Mood DJ']),
       el('button.btn', { onclick: () => $('#filePicker').click() }, [icon('plus'), 'Add tracks']),
-      el('button.btn', { onclick: openThemeDock }, [icon('palette'), theme.name]),
+      el('button.btn.hero-theme', { onclick: openThemeDock }, [icon('palette'), theme.name]),
     ]),
   );
   root.append(hero);
@@ -1094,85 +1095,109 @@ function importData() {
 export function openEQ() {
   const body = el('div.eq-panel');
 
-  const enableRow = el('div.set-row', {}, [
-    el('div.grow', {}, [el('b', { text: 'Equalizer' }), el('small', { text: 'ten bands, applied live' })]),
-    (() => {
-      const sw = el('div.switch', { class: state.settings.eqEnabled ? 'on' : '' });
-      const w = el('div', { style: { cursor: 'pointer' }, onclick: () => {
-        const on = !state.settings.eqEnabled;
-        setSetting('eqEnabled', on);
-        sw.classList.toggle('on', on);
-        engine.setEQAll(on ? state.settings.eqGains : EQ_PRESETS.flat);
-      } }, [sw]);
-      return w;
-    })(),
+  /* ── on / off ── */
+  const sw = el('div.switch', { class: state.settings.eqEnabled ? 'on' : '' });
+  const setEnabled = (on) => {
+    setSetting('eqEnabled', on);
+    sw.classList.toggle('on', on);
+    engine.setEQAll(on ? state.settings.eqGains : EQ_PRESETS.flat);
+    engine.setBass(on ? state.settings.bassBoost : 0);
+    wrap.classList.toggle('is-off', !on);
+  };
+  const enableRow = el('div.set-row', { style: { cursor: 'pointer' }, onclick: () => setEnabled(!state.settings.eqEnabled) }, [
+    el('div.grow', {}, [el('b', { text: 'Equalizer' }), el('small', { text: 'drag any point on the curve' })]),
+    sw,
   ]);
   body.append(enableRow);
 
-  const bands = el('div.eq-bands');
-  const labels = [];
-  EQ_BANDS.forEach((hz, i) => {
-    const db = el('div.eq-db', { text: fmtDb(state.settings.eqGains[i]) });
-    const slider = el('input.eq-slider', {
-      type: 'range', min: '-12', max: '12', step: '0.5',
-      value: String(state.settings.eqGains[i]),
-      'aria-label': `${hz} hertz`,
-    });
-    slider.addEventListener('input', () => {
-      const v = parseFloat(slider.value);
-      state.settings.eqGains[i] = v;
-      setSetting('eqGains', state.settings.eqGains);
-      setSetting('eqPreset', 'custom');
-      db.textContent = fmtDb(v);
-      if (state.settings.eqEnabled) engine.setEQ(i, v);
-    });
-    labels.push({ slider, db });
-    bands.append(el('div.eq-band', {}, [db, slider, el('div.eq-hz', { text: hz >= 1000 ? (hz / 1000) + 'k' : String(hz) })]));
-  });
-  body.append(bands);
+  /* ── the curve ── */
+  const canvas = el('canvas.eq-canvas');
+  const wrap = el('div.eq-graph', { class: state.settings.eqEnabled ? '' : 'is-off' }, [
+    canvas,
+    el('div.eq-off-hint', { text: 'Equalizer is off — drag to switch it on' }),
+  ]);
+  body.append(wrap);
 
+  const graph = new EQGraph(canvas, engine, state.settings.eqGains, (i, db) => {
+    // dragging implies you want it on
+    if (!state.settings.eqEnabled) setEnabled(true);
+    setSetting('eqGains', state.settings.eqGains);
+    setSetting('eqPreset', 'custom');
+    engine.setEQ(i, db);
+    markPreset('custom');
+  });
+
+  /* ── presets ── */
   const presets = el('div.preset-row');
+  const markPreset = (name) => [...presets.children].forEach(c =>
+    c.classList.toggle('is-on', c.dataset.preset === name));
+
   for (const name of Object.keys(EQ_PRESETS)) {
     presets.append(el('button.chip', {
+      dataset: { preset: name },
       class: state.settings.eqPreset === name ? 'is-on' : '',
       text: name[0].toUpperCase() + name.slice(1),
       onclick: () => {
         const gains = [...EQ_PRESETS[name]];
-        setSetting('eqGains', gains);
+        state.settings.eqGains.splice(0, gains.length, ...gains);   // keep the graph's reference alive
+        setSetting('eqGains', state.settings.eqGains);
         setSetting('eqPreset', name);
-        if (!state.settings.eqEnabled) { setSetting('eqEnabled', true); enableRow.querySelector('.switch').classList.add('on'); }
-        engine.setEQAll(gains);
-        gains.forEach((v, i) => { labels[i].slider.value = v; labels[i].db.textContent = fmtDb(v); });
-        [...presets.children].forEach(c => c.classList.toggle('is-on', c.textContent.toLowerCase() === name));
+        if (!state.settings.eqEnabled) setEnabled(true);
+        else engine.setEQAll(gains);
+        markPreset(name);
       },
     }));
   }
-  body.append(el('div', {}, [el('h4', { style: { fontSize: '12px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '10px' }, text: 'Presets' }), presets]));
-
-  /* extra bass shelf */
-  const bassVal = el('b.mono', { style: { color: 'var(--accent)', minWidth: '48px', textAlign: 'right' }, text: fmtDb(state.settings.bassBoost) });
-  const bassIn = el('input.range', { type: 'range', min: '0', max: '14', step: '0.5', value: String(state.settings.bassBoost), style: { maxWidth: '200px' } });
-  bassIn.addEventListener('input', () => {
-    const v = parseFloat(bassIn.value);
-    setSetting('bassBoost', v); bassVal.textContent = fmtDb(v); engine.setBass(v);
-  });
-  body.append(el('div.set-row', {}, [
-    el('div.grow', {}, [el('b', { text: 'Extra bass' }), el('small', { text: 'a low shelf below 110 Hz, on top of the bands' })]),
-    bassIn, bassVal,
+  body.append(el('div', {}, [
+    el('h4', { style: { fontSize: '12px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '10px' }, text: 'Presets' }),
+    presets,
   ]));
 
-  sheet({
-    title: 'Equalizer', sub: 'Changes are audible immediately — no need to restart the track.',
-    body, wide: true,
-    actions: [{ label: 'Reset to flat', run: () => {
-      setSetting('eqGains', [...EQ_PRESETS.flat]); setSetting('eqPreset', 'flat');
-      setSetting('bassBoost', 0); engine.setBass(0); engine.resetEQ();
-      labels.forEach(l => { l.slider.value = 0; l.db.textContent = fmtDb(0); });
-      bassIn.value = 0; bassVal.textContent = fmtDb(0);
-      [...presets.children].forEach(c => c.classList.toggle('is-on', c.textContent === 'Flat'));
-    } }, { label: 'Done', primary: true, run: closeModal }],
+  /* ── extra bass shelf ── */
+  const bassVal = el('b.mono', { style: { color: 'var(--accent)', minWidth: '48px', textAlign: 'right' }, text: fmtDb(state.settings.bassBoost) });
+  const bassIn = el('input.range', { type: 'range', min: '0', max: '14', step: '0.5', value: String(state.settings.bassBoost) });
+  const paintBass = () => bassIn.style.setProperty('--p', (bassIn.value / 14 * 100) + '%');
+  paintBass();
+  bassIn.addEventListener('input', () => {
+    const v = parseFloat(bassIn.value);
+    setSetting('bassBoost', v);
+    bassVal.textContent = fmtDb(v);
+    paintBass();
+    if (!state.settings.eqEnabled) setEnabled(true);
+    else engine.setBass(v);
   });
+  body.append(el('div.set-row.eq-bass', {}, [
+    el('div.grow', {}, [el('b', { text: 'Extra bass' }), el('small', { text: 'a low shelf under 110 Hz, on top of the bands' })]),
+    el('div.row.eq-bass-ctl', {}, [bassIn, bassVal]),
+  ]));
+
+  const { box } = sheet({
+    title: 'Equalizer',
+    sub: 'Drag the curve. Everything is audible immediately.',
+    body, wide: true,
+    actions: [
+      { label: 'Flat', run: () => {
+        state.settings.eqGains.splice(0, 10, ...EQ_PRESETS.flat);
+        setSetting('eqGains', state.settings.eqGains);
+        setSetting('eqPreset', 'flat');
+        setSetting('bassBoost', 0);
+        engine.resetEQ(); engine.setBass(0);
+        bassIn.value = 0; bassVal.textContent = fmtDb(0); paintBass();
+        markPreset('flat');
+      } },
+      { label: 'Done', primary: true, run: closeModal },
+    ],
+  });
+
+  graph.start();
+  // stop the render loop when the sheet goes away
+  const mo = new MutationObserver(() => {
+    if (!canvas.isConnected) { graph.stop(); mo.disconnect(); }
+  });
+  mo.observe($('#modalRoot'), { childList: true, subtree: true });
+  return graph;
 }
+
 const fmtDb = (v) => (v > 0 ? '+' : '') + Number(v).toFixed(1);
 
 export function openVocal() {

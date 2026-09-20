@@ -52,8 +52,9 @@ export function modal(content, { wide = false, onClose = null } = {}) {
   modalCleanup = () => { onClose?.(); };
   root.onclick = (e) => { if (e.target === root) close(); };
   document.addEventListener('keydown', modalKey);
-  // focus the first thing worth focusing
-  setTimeout(() => box.querySelector('input,button,select,textarea')?.focus(), 60);
+  // focus a text field if there is one; never grab focus onto a button,
+  // which just paints a focus ring the moment the sheet opens
+  setTimeout(() => box.querySelector('input:not([type=range]),textarea,select')?.focus(), 60);
   return { close, box };
 }
 
