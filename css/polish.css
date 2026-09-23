@@ -151,37 +151,9 @@ body.playing .pb-art::after{
 .t-stream .ico{width:15px;height:15px}
 .track:hover .t-stream,.track.is-current .t-stream{opacity:1;color:var(--accent)}
 
-/* ── list rows need a floor ───────────────────────────────────
-   The character stands behind the whole app, and on the list screens
-   there is text all the way out to the right edge. Measured against
-   her, a row's duration and buttons came in at 2.4:1 — below even the
-   large-text threshold — while the title on the left read fine.
-   Giving every row its own pane of glass puts a consistent surface
-   under the full width of it. She still reads as atmosphere; the
-   metadata stops competing with her for contrast. No backdrop-filter
-   here on purpose: this is up to ~36 rows at once, and a plain
-   translucent fill buys the same legibility for none of the cost. */
-.view[data-view="library"] .track,
-.view[data-view="queue"] .track,
-.view[data-view="playlists"] .track,
-.view[data-view="search"] .track{
-  background:color-mix(in oklab,var(--bg-1) 72%,transparent);
-  box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--stroke) 45%,transparent);
-}
-.view[data-view="library"] .track:hover,
-.view[data-view="queue"] .track:hover,
-.view[data-view="playlists"] .track:hover,
-.view[data-view="search"] .track:hover{
-  background:color-mix(in oklab,var(--bg-2) 88%,transparent);
-}
-.view[data-view="library"] .track.is-current,
-.view[data-view="queue"] .track.is-current,
-.view[data-view="playlists"] .track.is-current,
-.view[data-view="search"] .track.is-current{
-  background:color-mix(in oklab,var(--accent) 16%,var(--bg-1) 78%);
-}
-/* and a touch more presence for the muted bits now that they have a floor */
-.t-dur{color:var(--text-2)}
+/* Row surfaces, card/tile elevation, button states and the type ramp
+   all moved to css/design.css, which owns them as component tokens.
+   Two files setting the same background is how a design system rots. */
 
 /* the line under "Nothing up next" — guidance, not an error */
 .queue-hint{
