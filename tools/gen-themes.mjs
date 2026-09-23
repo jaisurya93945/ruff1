@@ -25,6 +25,56 @@ const pal = JSON.parse(readFileSync(resolve(ROOT, 'images/chars/palettes.json'),
 
 const hsl = (h, s, l, a) => `hsl(${h} ${s}% ${l}%${a != null ? ` / ${a}` : ''})`;
 
+/* ── contrast maths ───────────────────────────────────────────
+   HSL lightness is not perceptual luminance: a cyan at 46% is far
+   brighter than a blue at 46%, so a lightness threshold picks white
+   text for colours that cannot carry it. Convert to real relative
+   luminance and choose whichever of dark/white actually measures
+   better, per WCAG.
+   ─────────────────────────────────────────────────────────── */
+function hslToRgb(h, s, l) {
+  h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const [r, g, b] =
+    h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] :
+    h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+}
+
+function parseColor(str) {
+  const hslMatch = str.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%/i);
+  if (hslMatch) return hslToRgb(+hslMatch[1], +hslMatch[2], +hslMatch[3]);
+  const hex = str.trim().replace('#', '');
+  if (/^[0-9a-f]{6}$/i.test(hex)) {
+    return [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
+  }
+  if (/^[0-9a-f]{3}$/i.test(hex)) {
+    return [0, 1, 2].map(i => parseInt(hex[i] + hex[i], 16));
+  }
+  return [128, 128, 128];
+}
+
+const luminance = (rgb) => {
+  const [r, g, b] = rgb.map(v => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+function contrast(a, b) {
+  const [hi, lo] = [luminance(parseColor(a)), luminance(parseColor(b))].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/** text that sits *on* the accent: the play glyph, a primary button label */
+function onAccent(color, hue) {
+  const dark = hsl(hue, 42, 9);
+  return contrast(color, dark) >= contrast(color, '#ffffff') ? dark : '#ffffff';
+}
+
 function block(c) {
   const p = pal[c.id];
   if (!p) throw new Error(`no palette for ${c.id} — run prep-art.mjs first`);
@@ -46,6 +96,7 @@ function block(c) {
   --accent:${a1}; --accent-2:${a2}; --accent-3:${a3};
   --accent-grad:linear-gradient(120deg, ${a1}, ${a2} 45%, ${a3});
   --glow:color-mix(in oklab, ${a1} 62%, transparent);
+  --on-accent:${onAccent(a1, H)};
 }
 [data-theme="${c.id}"][data-mode="light"]{
   --bg-0:${hsl(H, 26, 97)}; --bg-1:${hsl(H, 28, 94)}; --bg-2:${hsl(H, 26, 90)};
@@ -55,6 +106,7 @@ function block(c) {
   --accent:${l1}; --accent-2:${l2}; --accent-3:${l3};
   --accent-grad:linear-gradient(120deg, ${l1}, ${l2} 45%, ${l3});
   --glow:color-mix(in oklab, ${l1} 38%, transparent);
+  --on-accent:${onAccent(l1, H)};
 }`;
 }
 
@@ -73,7 +125,7 @@ ${CHARACTERS.map(block).join('\n')}
   --stroke:#2a2a3270; --stroke-2:#3c3c47;
   --accent:#e8e8ef; --accent-2:#ffffff; --accent-3:#9a9aab;
   --accent-grad:linear-gradient(120deg,#e8e8ef,#ffffff 45%,#9a9aab);
-  --glow:#ffffff55; --aurora-op:.2;
+  --glow:#ffffff55; --aurora-op:.2; --on-accent:#0b0b0e;
 }
 [data-theme="mono"][data-mode="light"]{
   --bg-0:#fbfbfc; --bg-1:#f3f3f5; --bg-2:#eaeaee;
@@ -82,7 +134,7 @@ ${CHARACTERS.map(block).join('\n')}
   --stroke:#e0e0e6; --stroke-2:#c6c6d0;
   --accent:#2a2a33; --accent-2:#4b4b58; --accent-3:#7a7a8a;
   --accent-grad:linear-gradient(120deg,#2a2a33,#4b4b58 45%,#7a7a8a);
-  --glow:#2a2a3340; --aurora-op:.16;
+  --glow:#2a2a3340; --aurora-op:.16; --on-accent:#fff;
 }
 
 /* the live accent-from-cover-art override still wins over all of it */

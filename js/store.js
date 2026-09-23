@@ -81,6 +81,10 @@ export const state = {
   stats: ls.get('stats', {}),          // trackId -> {plays, ms, last, skips}
   echo: ls.get('echo', {}),            // trackId -> number[64] replay heat
   recent: ls.get('recent', []),        // trackIds, newest first
+  // A streaming track's length isn't in the manifest — nothing here can read
+  // it without fetching the file. The browser knows it the moment the track
+  // loads, so remember it and the library stops showing 0:00 next time.
+  durations: ls.get('durations', {}),  // trackId -> seconds
 
   /* runtime */
   settings: { ...DEFAULT_SETTINGS, ...ls.get('settings', {}) },
@@ -103,14 +107,43 @@ export function setSetting(key, value) {
 }
 
 /* ── persistence for the collection slices ────────────────── */
+/**
+ * The echo map is the only slice that grows without bound — 64 numbers per
+ * track, forever. At a few hundred tracks it is the biggest thing in
+ * localStorage, and when the quota is reached `setItem` throws and every
+ * other slice silently stops saving too. Drop the coldest tracks and retry.
+ */
+function pruneEcho(keep = 200) {
+  const scored = Object.keys(state.echo).map(id => ({
+    id,
+    // keep what you actually listen to: recency first, then play count
+    score: (state.stats[id]?.last || 0) + (state.stats[id]?.plays || 0) * 1e6,
+  })).sort((a, b) => b.score - a.score);
+
+  if (scored.length <= keep) return false;
+  const next = {};
+  for (const { id } of scored.slice(0, keep)) next[id] = state.echo[id];
+  const dropped = scored.length - keep;
+  state.echo = next;
+  console.info(`[aura] storage was full — dropped echo data for ${dropped} cold tracks`);
+  return true;
+}
+
 export const persist = {
   favorites: () => ls.set('favorites', [...state.favorites]),
   playlists: () => ls.set('playlists', state.playlists),
   marks:     () => ls.set('marks', state.marks),
   stats:     () => ls.set('stats', state.stats),
-  echo:      () => ls.set('echo', state.echo),
+  echo() {
+    if (ls.set('echo', state.echo)) return true;
+    // out of room: shed the coldest history and try once more
+    if (pruneEcho() && ls.set('echo', state.echo)) return true;
+    emit('notify', { text: 'Storage is full — older listening history was trimmed', icon: 'trash' });
+    return false;
+  },
   recent:    () => ls.set('recent', state.recent.slice(0, 60)),
-  all() { Object.keys(this).forEach(k => k !== 'all' && this[k]()); },
+  durations: () => ls.set('durations', state.durations),
+  all() { Object.keys(this).forEach(k => k !== 'all' && typeof this[k] === 'function' && this[k]()); },
 };
 
 /* ── favourites ───────────────────────────────────────────── */

@@ -60,12 +60,24 @@ body:has(.bg-char.on) .bg-viz{opacity:.3}
 }
 
 /* ── give her a column ─────────────────────────────────────
-   The home screen is the one place with room to spare, so on a
-   wide window its content stops short and she stands in the
-   gap rather than behind the panel.
+   A wide window has room to spare, so the content stops short and she
+   stands in the gap rather than behind it. Home reserves the most: it
+   has the least to read. The list screens reserve less but still enough
+   that a row ends before it reaches her — rows stretched the full 1120px
+   were both hard to scan and sitting right on top of her, which measured
+   at 2.4:1 for the duration and the row buttons.
    ───────────────────────────────────────────────────────── */
 @media (min-width:1180px){
   .view[data-view="home"]{padding-right:clamp(320px,30%,500px)}
+  .view[data-view="library"],
+  .view[data-view="queue"],
+  .view[data-view="playlists"],
+  .view[data-view="search"]{padding-right:clamp(260px,24%,420px)}
+  /* now that nothing overlaps her on these screens, she can come forward */
+  body[data-view="library"] .bg-char.on,
+  body[data-view="queue"] .bg-char.on,
+  body[data-view="playlists"] .bg-char.on,
+  body[data-view="search"] .bg-char.on{opacity:calc(var(--char-op,.3) * 1.9)}
 }
 @media (min-width:1180px) and (max-width:1400px){
   .view[data-view="home"] .card-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}

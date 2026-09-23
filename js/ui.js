@@ -3,7 +3,7 @@
    toasts, modals, context menus, track rows, lazy images,
    the waveform (with its echo-heat overlay), and lyrics.
    ═══════════════════════════════════════════════════════════ */
-import { $, $$, el, icon, fmtTime, fmtCount, clamp, lerp, fitCanvas, pointerRatio, haptic, debounce } from './util.js';
+import { $, $$, el, icon, fmtTime, fmtDur, fmtCount, clamp, lerp, fitCanvas, pointerRatio, haptic, debounce } from './util.js';
 import { state, isFavorite, toggleFavorite, statFor, marksFor, addMark, removeMark, trackById } from './store.js';
 import { player } from './player.js';
 import { echoHeat } from './features.js';
@@ -154,20 +154,69 @@ const lazyObserver = 'IntersectionObserver' in window
     }, { rootMargin: '360px 0px', threshold: 0.01 })
   : null;
 
+/* ═══ generated cover art ══════════════════════════════════
+   Most of the library has real artwork; some of it doesn't, and a
+   hotlinked cover can 404 or simply be unreachable offline. One shared
+   grey placeholder across a whole screen of those looks like a bug, so
+   derive a cover from the track itself instead: the same title always
+   produces the same colours, so the library stays recognisable at a
+   glance and nothing has to be fetched to draw it. */
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0);
+}
+
+const initialsOf = (title = '') => (String(title).match(/\p{L}\p{M}*|\p{N}/gu) || [])
+  .slice(0, 1).join('').toUpperCase() || '\u266A';   // ♪ when there's no letter at all
+
+export function generatedArt(track) {
+  const key = `${track?.artist || ''}::${track?.title || ''}` || 'aura';
+  const h = hashString(key);
+  const hue = h % 360;
+  const hue2 = (hue + 40 + (h >> 9) % 80) % 360;
+  const tilt = (h >> 17) % 90;
+  const letter = initialsOf(track?.title);
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">` +
+      `<defs><linearGradient id="g" gradientTransform="rotate(${tilt} .5 .5)">` +
+        `<stop offset="0" stop-color="hsl(${hue} 62% 46%)"/>` +
+        `<stop offset="1" stop-color="hsl(${hue2} 56% 22%)"/>` +
+      `</linearGradient></defs>` +
+      `<rect width="160" height="160" fill="url(#g)"/>` +
+      `<circle cx="126" cy="34" r="58" fill="hsl(${hue2} 70% 62%)" fill-opacity=".22"/>` +
+      `<circle cx="26" cy="140" r="44" fill="hsl(${hue} 80% 70%)" fill-opacity=".16"/>` +
+      `<text x="80" y="80" text-anchor="middle" dominant-baseline="central" ` +
+        `font-family="Outfit, system-ui, sans-serif" font-size="74" font-weight="600" ` +
+        `fill="#fff" fill-opacity=".92">${letter.replace(/[<>&]/g, '')}</text>` +
+    `</svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
 function loadImg(img, src) {
-  if (!src) { img.src = FALLBACK_ART; img.classList.add('ready'); return; }
+  const miss = img.dataset.fallback || FALLBACK_ART;
+  if (!src) { img.src = miss; img.classList.add('ready'); return; }
   const probe = new Image();
   probe.decoding = 'async';
   probe.onload = () => { img.src = src; img.classList.add('ready'); };
-  probe.onerror = () => { img.src = FALLBACK_ART; img.classList.add('ready'); };
+  probe.onerror = () => { img.src = miss; img.classList.add('ready'); };
   probe.src = src;
 }
 
-/** an <img> that only fetches once it's near the viewport */
-export function lazyImg(src, alt = '', cls = '') {
+/**
+ * An <img> that only fetches once it's near the viewport.
+ * `fallback` is what it shows before the real cover arrives and if the
+ * cover never does — pass a track to get generated art instead of the
+ * generic placeholder.
+ */
+export function lazyImg(src, alt = '', cls = '', fallback = null) {
   const img = el('img.lazy-img', { alt, class: cls, decoding: 'async', loading: 'lazy' });
+  const miss = typeof fallback === 'string' ? fallback
+             : fallback ? generatedArt(fallback)
+             : FALLBACK_ART;
   img.dataset.src = src || '';
-  img.src = FALLBACK_ART;
+  img.dataset.fallback = miss;
+  img.src = miss;
   if (lazyObserver) lazyObserver.observe(img);
   else loadImg(img, src);
   return img;
@@ -203,7 +252,7 @@ export function trackRow(track, opts = {}) {
     el('span.t-play', {}, [icon('play')]),
   );
 
-  const art = lazyImg(track.cover, '', 't-art');
+  const art = lazyImg(track.cover, '', 't-art', track);
 
   const main = el('div.t-main', {}, [
     el('div.t-title', { text: track.title, title: track.title }),
@@ -217,7 +266,12 @@ export function trackRow(track, opts = {}) {
   if (marksFor(track.id).length) {
     right.append(el('div.t-plays', { title: `${marksFor(track.id).length} moment marks` }, [icon('mark')]));
   }
-  right.append(el('div.t-dur.mono', { text: fmtTime(track.duration || 0) }));
+  // this one lives on someone else's server — say so, so a dead connection
+  // is an explanation rather than a mystery
+  if (/^https?:/i.test(track.src || '')) {
+    right.append(el('div.t-stream', { title: 'Streams from the network — needs a connection' }, [icon('cloud')]));
+  }
+  right.append(el('div.t-dur.mono', { text: fmtDur(track.duration || 0) }));
 
   const fav = el('button.icon-btn.tiny.t-act', {
     class: isFavorite(track.id) ? 'is-on' : '',

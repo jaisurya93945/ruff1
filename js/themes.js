@@ -105,6 +105,15 @@ export function initThemes() {
 
 const DEFAULT_ART = { focus: '50% 14%', fit: 'cover', scale: 1 };
 
+/* one live object URL per theme, released before a replacement is minted */
+const liveObjectURLs = new Map();
+function releaseObjectURL(themeId) {
+  const prev = liveObjectURLs.get(themeId);
+  if (!prev) return;
+  try { URL.revokeObjectURL(prev); } catch {}
+  liveObjectURLs.delete(themeId);
+}
+
 let overridesPromise = null;
 function loadOverrides() {
   overridesPromise ??= fetch('images/themes/overrides.json', { cache: 'no-cache' })
@@ -130,10 +139,16 @@ export async function themeArt(themeId) {
     try {
       const rec = await customArt.get(themeId);
       if (rec?.blob) {
+        // Each call used to mint a fresh blob URL and drop the previous one
+        // on the floor — the browser holds the blob alive until the URL is
+        // revoked, so swapping art repeatedly pinned every image in memory.
+        releaseObjectURL(themeId);
         const url = URL.createObjectURL(rec.blob);
+        liveObjectURLs.set(themeId, url);
         return { ...DEFAULT_ART, ...(rec.tune || {}), backdrop: url, card: url, lqip: '', custom: true };
       }
     } catch {}
+    releaseObjectURL(themeId);
 
     const meta = themeById(themeId);
     const bundled = meta.hasArt
@@ -174,12 +189,14 @@ export const customArt = {
     if (file.size > 12 * 1024 * 1024) throw new Error('That image is over 12 MB — resize it first.');
     await blobs.put(this.key(id), { blob: file, tune, at: Date.now() });
     artCache.delete(id);
+    releaseObjectURL(id);
     emit('theme:art', { theme: id });
     return true;
   },
   async clear(id) {
     await blobs.del(this.key(id));
     artCache.delete(id);
+    releaseObjectURL(id);
     emit('theme:art', { theme: id });
   },
   async has(id) { return !!(await this.get(id)); },

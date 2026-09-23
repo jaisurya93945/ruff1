@@ -3,7 +3,7 @@
    live listener count, sleep timer, cross-tab sync,
    shareable vibe cards, Mood DJ, and the listening DNA.
    ═══════════════════════════════════════════════════════════ */
-import { $, el, clamp, fmtTime, fmtSpan, fmtCount, ls, uid, download, fitCanvas, supports } from './util.js';
+import { $, el, clamp, fmtTime, fmtSpan, fmtCount, ls, uid, download, fitCanvas, supports, withAlpha } from './util.js';
 import { state, set, emit, on, setSetting, statFor, echoFor, ECHO_BUCKETS } from './store.js';
 import { engine } from './engine.js';
 import { getEnergy, guessEnergy, arrangeByCurve, arcPreset } from './analysis.js';
@@ -255,7 +255,7 @@ export async function makeVibeCard(track, { peaks = null, width = 1080, height =
   ctx.fillRect(0, 0, width, height);
   for (const [x, y, r, c] of [[0.2, 0.1, 0.7, accent], [0.85, 0.3, 0.6, accent3], [0.5, 0.95, 0.65, accent2]]) {
     const g = ctx.createRadialGradient(x * width, y * height, 0, x * width, y * height, r * width);
-    g.addColorStop(0, c + '55'); g.addColorStop(1, c + '00');
+    g.addColorStop(0, withAlpha(c, 0.33)); g.addColorStop(1, withAlpha(c, 0));
     ctx.fillStyle = g; ctx.fillRect(0, 0, width, height);
   }
 
@@ -434,7 +434,7 @@ export function drawMoodCurve(canvas, curve, points = []) {
   /* fill under */
   ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
   const gf = ctx.createLinearGradient(0, 0, 0, H);
-  gf.addColorStop(0, accent + '44'); gf.addColorStop(1, accent + '00');
+  gf.addColorStop(0, withAlpha(accent, 0.27)); gf.addColorStop(1, withAlpha(accent, 0));
   ctx.fillStyle = gf; ctx.fill();
 
   /* the actual tracks */
@@ -503,7 +503,7 @@ export function drawDNA(canvas, tracks) {
     ctx.arc(cx, cy, R * 0.14, a1, a0, true);
     ctx.closePath();
     const g = ctx.createRadialGradient(cx, cy, R * 0.14, cx, cy, len);
-    g.addColorStop(0, col + '33'); g.addColorStop(1, col + 'dd');
+    g.addColorStop(0, withAlpha(col, 0.2)); g.addColorStop(1, withAlpha(col, 0.87));
     ctx.fillStyle = g;
     ctx.fill();
 

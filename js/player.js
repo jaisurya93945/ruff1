@@ -325,7 +325,12 @@ engine.addEventListener('pause', () => {
 
 engine.addEventListener('loaded', (e) => {
   const d = e.detail.duration || 0;
-  if (state.current && d && !state.current.duration) state.current.duration = d;
+  if (state.current && d && !state.current.duration) {
+    state.current.duration = d;
+    state.durations[state.current.id] = Math.round(d * 10) / 10;
+    persist.durations();
+    emit('learned-duration', state.current);   // repaint the row that said "—"
+  }
   set({ duration: d }, 'duration');
   player._updatePositionState();
   emit('duration', d);

@@ -13,6 +13,7 @@
   --accent:hsl(185 46% 74%); --accent-2:hsl(194 67% 74%); --accent-3:hsl(242 59% 70%);
   --accent-grad:linear-gradient(120deg, hsl(185 46% 74%), hsl(194 67% 74%) 45%, hsl(242 59% 70%));
   --glow:color-mix(in oklab, hsl(185 46% 74%) 62%, transparent);
+  --on-accent:hsl(185 42% 9%);
 }
 [data-theme="aoi"][data-mode="light"]{
   --bg-0:hsl(185 26% 97%); --bg-1:hsl(185 28% 94%); --bg-2:hsl(185 26% 90%);
@@ -22,6 +23,7 @@
   --accent:hsl(185 50% 46%); --accent-2:hsl(194 50% 46%); --accent-3:hsl(242 50% 46%);
   --accent-grad:linear-gradient(120deg, hsl(185 50% 46%), hsl(194 50% 46%) 45%, hsl(242 50% 46%));
   --glow:color-mix(in oklab, hsl(185 50% 46%) 38%, transparent);
+  --on-accent:hsl(185 42% 9%);
 }
 
 /* ── Nyx · midnight cat ─────────────────────────────── */
@@ -33,6 +35,7 @@
   --accent:hsl(335 61% 56%); --accent-2:hsl(21 79% 74%); --accent-3:hsl(304 54% 56%);
   --accent-grad:linear-gradient(120deg, hsl(335 61% 56%), hsl(21 79% 74%) 45%, hsl(304 54% 56%));
   --glow:color-mix(in oklab, hsl(335 61% 56%) 62%, transparent);
+  --on-accent:hsl(335 42% 9%);
 }
 [data-theme="nyx"][data-mode="light"]{
   --bg-0:hsl(335 26% 97%); --bg-1:hsl(335 28% 94%); --bg-2:hsl(335 26% 90%);
@@ -42,6 +45,7 @@
   --accent:hsl(335 50% 36%); --accent-2:hsl(21 79% 46%); --accent-3:hsl(304 50% 30%);
   --accent-grad:linear-gradient(120deg, hsl(335 50% 36%), hsl(21 79% 46%) 45%, hsl(304 50% 30%));
   --glow:color-mix(in oklab, hsl(335 50% 36%) 38%, transparent);
+  --on-accent:#ffffff;
 }
 
 /* ── Mizu · shoreline ─────────────────────────────── */
@@ -53,6 +57,7 @@
   --accent:hsl(186 66% 74%); --accent-2:hsl(244 55% 56%); --accent-3:hsl(37 89% 74%);
   --accent-grad:linear-gradient(120deg, hsl(186 66% 74%), hsl(244 55% 56%) 45%, hsl(37 89% 74%));
   --glow:color-mix(in oklab, hsl(186 66% 74%) 62%, transparent);
+  --on-accent:hsl(186 42% 9%);
 }
 [data-theme="mizu"][data-mode="light"]{
   --bg-0:hsl(186 26% 97%); --bg-1:hsl(186 28% 94%); --bg-2:hsl(186 26% 90%);
@@ -62,6 +67,7 @@
   --accent:hsl(186 66% 46%); --accent-2:hsl(244 50% 30%); --accent-3:hsl(37 89% 46%);
   --accent-grad:linear-gradient(120deg, hsl(186 66% 46%), hsl(244 50% 30%) 45%, hsl(37 89% 46%));
   --glow:color-mix(in oklab, hsl(186 66% 46%) 38%, transparent);
+  --on-accent:hsl(186 42% 9%);
 }
 
 /* ── Kaede · hot spring ─────────────────────────────── */
@@ -73,6 +79,7 @@
   --accent:hsl(345 69% 74%); --accent-2:hsl(207 61% 56%); --accent-3:hsl(188 67% 56%);
   --accent-grad:linear-gradient(120deg, hsl(345 69% 74%), hsl(207 61% 56%) 45%, hsl(188 67% 56%));
   --glow:color-mix(in oklab, hsl(345 69% 74%) 62%, transparent);
+  --on-accent:hsl(345 42% 9%);
 }
 [data-theme="kaede"][data-mode="light"]{
   --bg-0:hsl(345 26% 97%); --bg-1:hsl(345 28% 94%); --bg-2:hsl(345 26% 90%);
@@ -82,6 +89,7 @@
   --accent:hsl(345 69% 46%); --accent-2:hsl(207 61% 36%); --accent-3:hsl(188 50% 30%);
   --accent-grad:linear-gradient(120deg, hsl(345 69% 46%), hsl(207 61% 36%) 45%, hsl(188 50% 30%));
   --glow:color-mix(in oklab, hsl(345 69% 46%) 38%, transparent);
+  --on-accent:#ffffff;
 }
 
 /* ── Null · no artwork, no distractions ─────────────────── */
@@ -92,7 +100,7 @@
   --stroke:#2a2a3270; --stroke-2:#3c3c47;
   --accent:#e8e8ef; --accent-2:#ffffff; --accent-3:#9a9aab;
   --accent-grad:linear-gradient(120deg,#e8e8ef,#ffffff 45%,#9a9aab);
-  --glow:#ffffff55; --aurora-op:.2;
+  --glow:#ffffff55; --aurora-op:.2; --on-accent:#0b0b0e;
 }
 [data-theme="mono"][data-mode="light"]{
   --bg-0:#fbfbfc; --bg-1:#f3f3f5; --bg-2:#eaeaee;
@@ -101,7 +109,7 @@
   --stroke:#e0e0e6; --stroke-2:#c6c6d0;
   --accent:#2a2a33; --accent-2:#4b4b58; --accent-3:#7a7a8a;
   --accent-grad:linear-gradient(120deg,#2a2a33,#4b4b58 45%,#7a7a8a);
-  --glow:#2a2a3340; --aurora-op:.16;
+  --glow:#2a2a3340; --aurora-op:.16; --on-accent:#fff;
 }
 
 /* the live accent-from-cover-art override still wins over all of it */

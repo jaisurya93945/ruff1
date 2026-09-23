@@ -35,8 +35,33 @@ export function renderView(name) {
   node._cleanup?.();          // drop listeners the previous render attached
   node._cleanup = null;
   node.innerHTML = '';
-  RENDERERS[name]?.(node);
+
+  try {
+    RENDERERS[name]?.(node);
+  } catch (err) {
+    // One bad record should not cost you the whole screen with no way back.
+    console.error(`[aura] "${name}" failed to render`, err);
+    node.innerHTML = '';
+    node.append(renderFailure(name, err));
+  }
   node.scrollTop = 0;
+}
+
+function renderFailure(name, err) {
+  return el('div.empty', { style: { paddingTop: 'var(--s-8)' } }, [
+    icon('lab'),
+    el('b', { text: 'This screen hit a snag' }),
+    el('p', { html: `Something in <b>${name}</b> could not be drawn. The rest of the app is fine — playback has not been interrupted.` }),
+    el('code', {
+      style: { fontSize: '11.5px', color: 'var(--text-3)', maxWidth: '46ch', display: 'block',
+               wordBreak: 'break-word', marginTop: '4px' },
+      text: String(err?.message || err).slice(0, 200),
+    }),
+    el('div.row', { style: { marginTop: 'var(--s-4)', gap: '8px' } }, [
+      el('button.btn.primary', { onclick: () => renderView(name) }, [icon('repeat'), 'Try again']),
+      el('button.btn', { onclick: () => setView('home') }, [icon('home'), 'Go home']),
+    ]),
+  ]);
 }
 export function refreshCurrentView() { renderView(state.view); }
 
@@ -149,7 +174,7 @@ function rowSection(title, sub, tracks, { icon: ico, more } = {}) {
 function trackCard(track, context) {
   const card = el('div.card', { role: 'button', tabindex: '0' });
   const art = el('div.card-art');
-  art.append(lazyImg(track.cover, ''), el('div.card-stack'));
+  art.append(lazyImg(track.cover, '', '', track), el('div.card-stack'));
   const play = el('button.card-play', {
     'aria-label': `Play ${track.title}`,
     onclick: (e) => { e.stopPropagation(); player.setQueue(context, context.indexOf(track)); },
@@ -337,8 +362,15 @@ RENDERERS.queue = (root) => {
     root.append(now);
   }
 
+  // With one track queued and playing there is nothing to list — a bare
+  // "Queue" heading over empty space reads as something failing to load.
   const next = el('div.sec');
-  next.append(el('div.eyebrow', { text: upcoming > 0 ? 'Up next — drag to reorder' : 'Queue' }));
+  next.append(el('div.eyebrow', { text: upcoming > 0 ? 'Up next — drag to reorder' : 'Nothing up next' }));
+  if (upcoming <= 0) {
+    next.append(el('p.queue-hint', { html: 'When this finishes, playback stops. Add more from your library, or turn on <b>repeat</b> to keep it going.' }));
+    root.append(next);
+    return;
+  }
   const list = el('div');
   tracks.forEach((t, i) => {
     if (i === state.qIndex) return;

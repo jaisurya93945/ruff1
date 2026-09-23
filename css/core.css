@@ -1,4 +1,21 @@
 /* ═══════════════════════════════════════════════════════════
+   Type is self-hosted. A CDN webfont is the one thing in this
+   app that stops working offline, on a locked-down network, or
+   behind a corporate proxy — and it fails *visibly*, dropping
+   the whole interface to a system fallback. One 31KB variable
+   file covering 200–800 replaces two external requests.
+   ═══════════════════════════════════════════════════════════ */
+@font-face{
+  font-family:'Outfit';
+  font-style:normal;
+  font-weight:200 800;
+  font-display:swap;
+  src:url('../fonts/outfit-variable.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,
+    U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* ═══════════════════════════════════════════════════════════
    AURA · core — reset, design tokens, morphism engine, layout
    ═══════════════════════════════════════════════════════════ */
 
@@ -41,7 +58,7 @@ ul,ol{list-style:none}
   --spring:cubic-bezier(.34,1.56,.64,1);
   --t-fast:.14s; --t:.26s; --t-slow:.5s;
   --blur:26px; --sat:180%;
-  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
+  --font-mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
   --z-bg:0; --z-app:10; --z-bar:60; --z-nav:65; --z-np:80; --z-dock:90; --z-modal:100; --z-toast:120; --z-ctx:130;
 }
 

@@ -2,7 +2,7 @@
    AURA · main — boot, wiring, keyboard, and the render loop
    that keeps the player chrome in step with the audio.
    ═══════════════════════════════════════════════════════════ */
-import { $, $$, el, icon, fmtTime, clamp, debounce, throttle, supports, haptic, ls, pointerRatio } from './util.js';
+import { $, $$, el, icon, fmtTime, clamp, debounce, throttle, supports, haptic, ls, pointerRatio, fmtDur} from './util.js';
 import {
   state, set, on, emit, setSetting, trackById, tracksByIds, isFavorite, toggleFavorite,
   addMark, marksFor, persist,
@@ -16,7 +16,7 @@ import {
   presence, renderPresence, sleep as sleepTimer, tabSync, wakeLock, echoHeat,
 } from './features.js';
 import {
-  toast, modal, closeModal, modalOpen, confirm, WaveformView, LyricsView, trackRow, lazyImg, FALLBACK_ART, closeContext,
+  toast, modal, closeModal, modalOpen, confirm, WaveformView, LyricsView, trackRow, lazyImg, FALLBACK_ART, generatedArt, closeContext,
 } from './ui.js';
 import { cloud, consumePairingLink } from './cloud.js';
 import {
@@ -79,6 +79,9 @@ async function start() {
     boot.say('checking the files…');
     tracks = await pruneMissing(tracks);
   }
+  // a length we learned on a previous visit beats the manifest's 0
+  for (const t of tracks) if (!t.duration && state.durations[t.id]) t.duration = state.durations[t.id];
+
   set({ tracks, ready: true }, 'library');
 
   /* views + chrome */
@@ -231,7 +234,9 @@ function wireChrome() {
   on('presence', renderPresence);
   on('trackchange', onTrackChange);
   on('time', onTime);
-  on('duration', () => { $('#pbDur').textContent = fmtTime(state.duration); $('#npDur').textContent = fmtTime(state.duration); wave.duration = state.duration; paintMarks(); });
+  on('duration', () => { $('#pbDur').textContent = fmtDur(state.duration); $('#npDur').textContent = fmtDur(state.duration); wave.duration = state.duration; paintMarks(); });
+  // a streaming track only reveals its length once it loads — show it now
+  on('learned-duration', () => { if (['home', 'queue', 'library', 'playlists'].includes(state.view)) refreshCurrentView(); });
   on('playstate', paintPlayState);
   on('buffered', ({ buffered, duration }) => {
     if (duration) $('#pbBuffered').style.width = (buffered / duration * 100).toFixed(2) + '%';
@@ -252,7 +257,6 @@ function wireChrome() {
   on('theme:art', () => { if (state.view === 'home') renderView('home'); });
   on('accent', () => { viz?.refreshColors(); wave?.draw(); });
   on('artcolor', (onFlag) => onFlag ? applyArtColor(state.current?.cover) : clearArtColor());
-  on('bgviz', (onFlag) => { $('#bgViz').style.display = onFlag ? '' : 'none'; });
   on('sleep', paintSleep);
 
   /* ── cross-device sync ─────────────────────────────── */
@@ -294,7 +298,6 @@ function wireChrome() {
 
   paintModes();
   paintQueueBadge();
-  $('#bgViz').style.display = state.settings.bgViz ? '' : 'none';
 }
 
 const hash = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 9999;
@@ -302,14 +305,15 @@ const hash = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >
 /* ═══ painting ═════════════════════════════════════════════ */
 
 function onTrackChange(track) {
-  const art = track?.cover || FALLBACK_ART;
+  const miss = track ? generatedArt(track) : FALLBACK_ART;
+  const art = track?.cover || miss;
   $('#pbTitle').textContent = track?.title || 'Nothing playing';
   $('#pbArtist').textContent = track ? [track.artist, track.album].filter(Boolean).join(' · ') : 'pick a track to begin';
   $('#npTitle').textContent = track?.title || '—';
   $('#npArtist').textContent = track ? [track.artist, track.album].filter(Boolean).join(' · ') : '—';
 
-  setArt($('#pbArt'), art);
-  setArt($('#npArt'), art);
+  setArt($('#pbArt'), art, miss);
+  setArt($('#npArt'), art, miss);
 
   const bgArt = $('#bgArt');
   if (track?.cover) { bgArt.style.backgroundImage = `url("${track.cover}")`; bgArt.classList.add('on'); }
@@ -324,8 +328,8 @@ function onTrackChange(track) {
   wave.setProgress(0);
   $('#pbCur').textContent = '0:00';
   $('#npCur').textContent = '0:00';
-  $('#pbDur').textContent = fmtTime(track?.duration || 0);
-  $('#npDur').textContent = fmtTime(track?.duration || 0);
+  $('#pbDur').textContent = fmtDur(track?.duration || 0);
+  $('#npDur').textContent = fmtDur(track?.duration || 0);
   $('#pbBuffered').style.width = '0%';
   stopMarkLoop();
   beat.reset();
@@ -334,11 +338,11 @@ function onTrackChange(track) {
   document.title = track ? `${track.title} — ${track.artist} · AURA` : 'AURA — Music Player';
 }
 
-function setArt(img, src) {
+function setArt(img, src, miss = FALLBACK_ART) {
   if (!img) return;
   const probe = new Image();
   probe.onload = () => { img.src = src; };
-  probe.onerror = () => { img.src = FALLBACK_ART; };
+  probe.onerror = () => { img.src = miss; };
   probe.src = src;
 }
 
@@ -570,9 +574,19 @@ function startVisualizers() {
   viz = new Visualizer($('#npViz'), engine, { mode: state.settings.vizMode || 0 });
   ring = new CoverRing($('#npRing'), engine);
 
-  /* the faint background spectrum */
+  /* The faint background spectrum. With nothing playing it has no data and
+     draws a synthetic idle wave — motion that costs a rAF loop and buys
+     nothing, since the aurora layer is already moving underneath it. Run it
+     only while there is actually audio to show. */
   const bg = new Visualizer($('#bgViz'), engine, { mode: 4, intensity: 0.85 });
-  bg.start();
+  const syncBgViz = () => {
+    const want = state.playing && state.settings.bgViz !== false;
+    want ? bg.start() : bg.stop();
+    $('#bgViz').style.opacity = want ? '' : '0';
+  };
+  on('playstate', syncBgViz);
+  on('bgviz', syncBgViz);
+  syncBgViz();
 
   /* beat detection drives the UI pulse + the BPM readout */
   let raf;
@@ -589,8 +603,8 @@ function startVisualizers() {
   pulse();
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { viz?.stop(); ring?.stop(); }
-    else { if (npOpen) { viz?.start(); ring?.start(); } }
+    if (document.hidden) { viz?.stop(); ring?.stop(); bg.stop(); }
+    else { if (npOpen) { viz?.start(); ring?.start(); } syncBgViz(); }
   });
 }
 

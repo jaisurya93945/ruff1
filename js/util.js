@@ -56,6 +56,10 @@ export function fmtTime(sec) {
            : `${m}:${String(s).padStart(2, '0')}`;
 }
 
+/** Like fmtTime, but an unknown length reads as a dash rather than "0:00" —
+    a streaming track has no duration in the manifest until it first loads. */
+export const fmtDur = (sec) => (Number.isFinite(sec) && sec > 0) ? fmtTime(sec) : '\u2014';
+
 /** 5_400_000ms → "1h 30m" */
 export function fmtSpan(ms) {
   const min = Math.round(ms / 60000);
@@ -99,14 +103,24 @@ export const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* ── fuzzy search ─────────────────────────────────────────── */
+/** Anything at or above this matched as a real substring, not a subsequence. */
+export const STRONG_MATCH = 600;
+
 /** subsequence score: higher = better, 0 = no match */
 export function fuzzyScore(needle, haystack) {
   if (!needle) return 1;
   const n = needle.toLowerCase(), h = String(haystack || '').toLowerCase();
   if (!h) return 0;
+
   const direct = h.indexOf(n);
   if (direct === 0) return 1000;            // prefix — strongest
-  if (direct > 0) return 700 - direct;      // substring
+  if (direct > 0) {
+    // "mereya" starting a word in "Channa Mereya" is what the user meant;
+    // the same letters buried mid-word are more often a coincidence.
+    const boundary = /[\s\-_/(\[.,&]/.test(h[direct - 1]);
+    return (boundary ? 900 : 700) - Math.min(direct, 60);
+  }
+
   let hi = 0, score = 0, streak = 0;
   for (let i = 0; i < n.length; i++) {
     const idx = h.indexOf(n[i], hi);
@@ -123,22 +137,31 @@ export function searchTracks(tracks, query) {
   const q = query.trim();
   if (!q) return tracks;
   const terms = q.split(/\s+/);
-  return tracks
-    .map(t => {
-      let total = 0;
-      for (const term of terms) {
-        const s = Math.max(
-          fuzzyScore(term, t.title) * 1.0,
-          fuzzyScore(term, t.artist) * 0.85,
-          fuzzyScore(term, t.album) * 0.7,
-          fuzzyScore(term, (t.genre || []).join(' ')) * 0.5,
-        );
-        if (!s) return null;
-        total += s;
+
+  const scored = tracks.map(t => {
+    const fields = [[t.title, 1], [t.artist, 0.85], [t.album, 0.7], [(t.genre || []).join(' '), 0.5]];
+    let total = 0, weakest = Infinity;
+    for (const term of terms) {
+      let best = 0, bestRaw = 0;
+      for (const [text, weight] of fields) {
+        const raw = fuzzyScore(term, text);
+        if (raw * weight > best) { best = raw * weight; bestRaw = raw; }
       }
-      return { t, total };
-    })
-    .filter(Boolean)
+      if (!best) return null;
+      total += best;
+      weakest = Math.min(weakest, bestRaw);      // judge strength unweighted
+    }
+    return { t, total, strong: weakest >= STRONG_MATCH };
+  }).filter(Boolean);
+
+  // Subsequence matching is what lets "chna mrya" find "Channa Mereya",
+  // but it also quietly decides that "husn" matches "Thousand Years"
+  // (t-H-o-U-S-a-N-d). Once the library is more than a handful of tracks
+  // that's just noise, so a real substring hit hides the loose ones —
+  // and they're still there when nothing matched properly, which is
+  // exactly when a typo needs them.
+  const strong = scored.filter(r => r.strong);
+  return (strong.length ? strong : scored)
     .sort((a, b) => b.total - a.total)
     .map(r => r.t);
 }
@@ -159,6 +182,29 @@ export function rgbToHsl(r, g, b) {
   return [h, s, l];
 }
 export const hsl = (h, s, l) => `hsl(${h.toFixed(0)} ${(s * 100).toFixed(0)}% ${(l * 100).toFixed(0)}%)`;
+
+/* Any CSS colour → an rgba() string at the alpha you ask for.
+   Canvas gradients need a colour string they can actually parse, so the
+   old `accent + '55'` trick quietly stopped working the moment a theme
+   declared its accent as hsl() instead of hex — addColorStop throws and
+   takes the whole render with it. Letting the 2D context do the parsing
+   covers hex, rgb(), hsl(), named colours and anything else the browser
+   understands, and falls back to the colour untouched if it can't. */
+let alphaProbe = null;
+export function withAlpha(color, alpha = 1) {
+  try {
+    alphaProbe ||= document.createElement('canvas').getContext('2d');
+    alphaProbe.fillStyle = '#000';
+    alphaProbe.fillStyle = color;
+    const v = alphaProbe.fillStyle;            // '#rrggbb' or 'rgba(r, g, b, a)'
+    if (v[0] === '#') {
+      const n = parseInt(v.slice(1), 16);
+      return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${alpha})`;
+    }
+    const [r, g, b] = v.slice(v.indexOf('(') + 1).split(',');
+    return `rgba(${r.trim()},${g.trim()},${b.trim()},${alpha})`;
+  } catch { return color; }
+}
 
 /* ── persistent settings (localStorage, namespaced, safe) ─── */
 const NS = 'aura:';

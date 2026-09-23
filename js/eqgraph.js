@@ -10,7 +10,7 @@
 
    Drag a node to change its band. Works with mouse and touch.
    ═══════════════════════════════════════════════════════════ */
-import { clamp, fitCanvas } from './util.js';
+import { clamp, fitCanvas, withAlpha } from './util.js';
 
 const F_MIN = 20, F_MAX = 20000;
 const DB_RANGE = 14;              // a little headroom past the ±12 limit
@@ -194,8 +194,8 @@ export class EQGraph {
       ctx.lineTo(W - p.r, H - p.b);
       ctx.closePath();
       const sg = ctx.createLinearGradient(0, p.t, 0, H - p.b);
-      sg.addColorStop(0, accent + '44');
-      sg.addColorStop(1, accent + '08');
+      sg.addColorStop(0, withAlpha(accent, 0.27));
+      sg.addColorStop(1, withAlpha(accent, 0.03));
       ctx.fillStyle = sg;
       ctx.fill();
     }
@@ -248,9 +248,9 @@ export class EQGraph {
     ctx.lineTo(p.l, zero);
     ctx.closePath();
     const fg = ctx.createLinearGradient(p.l, 0, W - p.r, 0);
-    fg.addColorStop(0, accent + '3a');
-    fg.addColorStop(0.5, accent2 + '3a');
-    fg.addColorStop(1, accent3 + '3a');
+    fg.addColorStop(0, withAlpha(accent, 0.23));
+    fg.addColorStop(0.5, withAlpha(accent2, 0.23));
+    fg.addColorStop(1, withAlpha(accent3, 0.23));
     ctx.fillStyle = fg;
     ctx.fill();
     ctx.restore();

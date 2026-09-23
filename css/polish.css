@@ -1,0 +1,191 @@
+/* ═══════════════════════════════════════════════════════════
+   AURA · polish — the last 5%.
+
+   Additive only: every rule here refines something that already
+   works. Nothing structural, nothing that changes layout maths,
+   so it cannot break what is underneath it.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── type ─────────────────────────────────────────────────────
+   Outfit is a variable font now, so weights are continuous
+   rather than snapped to the six static cuts that used to be
+   downloaded. Headings can sit at 650 instead of jumping 600→700.
+   ─────────────────────────────────────────────────────────── */
+body{
+  font-optical-sizing:auto;
+  font-synthesis-weight:none;          /* never fake a weight we have */
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3,.hero h1,.sec-head h2,.np-titles h2{
+  font-variation-settings:'wght' 650;
+  letter-spacing:-.028em;
+  text-wrap:balance;                   /* no orphaned last word */
+}
+.hero h1{font-variation-settings:'wght' 720;letter-spacing:-.036em}
+.stat-v{font-variation-settings:'wght' 700}
+p,.hero p.hero-sub,.sec-head p,.set-row small{text-wrap:pretty}
+.t-title,.pb-text b,.card-title{font-variation-settings:'wght' 520}
+.track.is-current .t-title{font-variation-settings:'wght' 620}
+/* numerals should never jitter as they count */
+.mono,.t-dur,.pb-time,.np-times,.stat-v{font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+
+/* ── focus: one consistent, themed ring everywhere ────────── */
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:8px;
+  transition:outline-offset var(--t-fast);
+}
+.track:focus-visible,.card:focus-visible,.theme-card:focus-visible{outline-offset:2px}
+.play-btn:focus-visible,.icon-btn:focus-visible{outline-offset:4px}
+
+/* ── track rows ───────────────────────────────────────────── */
+.track{position:relative;transition:background var(--t-fast),transform var(--t-fast)}
+.track::before{
+  content:'';position:absolute;left:0;top:50%;translate:0 -50%;
+  width:3px;height:0;border-radius:0 3px 3px 0;
+  background:var(--accent-grad);
+  transition:height var(--t) var(--spring);
+}
+.track.is-current::before{height:26px;box-shadow:0 0 12px var(--glow)}
+.track:hover .t-art,.card:hover .card-art{transform:scale(1.02)}
+.t-art{transition:transform var(--t) var(--ease)}
+.track:active{transform:scale(.994)}
+
+/* ── the now-playing art breathes with the music ──────────── */
+.pb-art img,#npArt{transition:opacity .34s var(--ease)}
+body.playing .pb-art::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--accent) 45%,transparent);
+}
+
+/* ── cards ────────────────────────────────────────────────── */
+.card{transition:transform var(--t) var(--spring),background var(--t),border-color var(--t),box-shadow var(--t)}
+.card:active{transform:translateY(-4px) scale(.988)}
+.card-art{position:relative}
+.card-art::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 0 1px color-mix(in oklab,#fff 10%,transparent);
+}
+
+/* ── buttons: a press you can feel ────────────────────────── */
+.btn,.chip,.icon-btn,.play-btn{transition:transform .12s var(--ease),background var(--t-fast),
+  border-color var(--t-fast),color var(--t-fast),box-shadow var(--t-fast)}
+.btn:active{transform:scale(.97)}
+.chip:active{transform:scale(.96)}
+.btn.primary{position:relative;overflow:hidden}
+.btn.primary::after{
+  /* a soft sheen across the primary action, not a moving gimmick */
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 30%,color-mix(in oklab,#fff 22%,transparent) 50%,transparent 70%);
+  opacity:0;transition:opacity var(--t);
+}
+.btn.primary:hover::after{opacity:1}
+
+/* ── scrollbars: present when you need them, gone when not ── */
+.view,.np-queue,.lyrics,.modal,.dock-panel{scrollbar-width:thin;scrollbar-gutter:stable}
+.view::-webkit-scrollbar-thumb,.modal::-webkit-scrollbar-thumb{
+  background:transparent;transition:background var(--t);
+}
+.view:hover::-webkit-scrollbar-thumb,.modal:hover::-webkit-scrollbar-thumb{
+  background:var(--stroke-2);border:3px solid transparent;background-clip:content-box;
+}
+
+/* ── surfaces: a hairline of light on top, like real glass ── */
+[data-morph="glass"] .pane,[data-morph="glass"] .modal,[data-morph="glass"] .hero,
+[data-morph="glass"] .dock-panel{position:relative}
+[data-morph="glass"] .pane::after,[data-morph="glass"] .modal::after,
+[data-morph="glass"] .dock-panel::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(color-mix(in oklab,#fff 6%,transparent),transparent 42%);
+}
+
+/* ── empty states read as designed, not as missing ────────── */
+.empty{gap:var(--s-4)}
+.empty .ico{
+  width:52px;height:52px;padding:13px;border-radius:50%;opacity:1;
+  background:color-mix(in oklab,var(--accent) 12%,transparent);
+  color:var(--accent);
+}
+.empty b{font-size:17px;font-variation-settings:'wght' 620}
+
+/* ── toasts stack rather than pile ────────────────────────── */
+#toasts{gap:6px}
+.toast{transition:transform var(--t) var(--ease)}
+#toasts .toast:not(:last-child){transform:scale(.96);opacity:.7}
+
+/* ── the seek bar deserves a real hit target ──────────────── */
+.pb-seek{position:relative}
+.pb-seek::before{content:'';position:absolute;inset:-9px 0;cursor:pointer}
+
+/* ── reduced motion still gets the polish, minus the movement  */
+@media (prefers-reduced-motion:reduce){
+  .track::before{transition:none}
+  .btn.primary::after{display:none}
+}
+
+/* ── legible on any accent ────────────────────────────────────
+   The palettes are extracted from artwork and lifted to 56–74%
+   lightness so they carry against dark chrome. That makes a good
+   number of them too pale for white text. --on-accent is chosen
+   per theme from the accent's own lightness.
+   ─────────────────────────────────────────────────────────── */
+.play-btn,.btn.primary{color:var(--on-accent,#fff)}
+.play-btn .ico,.btn.primary .ico{color:inherit}
+[data-mode="light"] .play-btn,[data-mode="light"] .btn.primary{color:var(--on-accent,#fff)}
+.rail-badge,.t-badge{color:var(--text)}
+.brand-glyph{color:var(--on-accent,#fff)}
+.card-play{color:var(--on-accent,#fff)}
+.switch.on::after{background:var(--on-accent,#fff)}
+
+/* ── streaming badge ──────────────────────────────────────────
+   A track that lives on a remote server behaves differently from one
+   in audio/ — it needs a connection and it can be slow. Mark it quietly
+   rather than letting a stall look like a broken player. */
+.t-stream{
+  display:grid;place-items:center;
+  width:22px;height:22px;flex:none;
+  color:var(--text-3);opacity:.7;
+  transition:opacity .18s ease,color .18s ease;
+}
+.t-stream .ico{width:15px;height:15px}
+.track:hover .t-stream,.track.is-current .t-stream{opacity:1;color:var(--accent)}
+
+/* ── list rows need a floor ───────────────────────────────────
+   The character stands behind the whole app, and on the list screens
+   there is text all the way out to the right edge. Measured against
+   her, a row's duration and buttons came in at 2.4:1 — below even the
+   large-text threshold — while the title on the left read fine.
+   Giving every row its own pane of glass puts a consistent surface
+   under the full width of it. She still reads as atmosphere; the
+   metadata stops competing with her for contrast. No backdrop-filter
+   here on purpose: this is up to ~36 rows at once, and a plain
+   translucent fill buys the same legibility for none of the cost. */
+.view[data-view="library"] .track,
+.view[data-view="queue"] .track,
+.view[data-view="playlists"] .track,
+.view[data-view="search"] .track{
+  background:color-mix(in oklab,var(--bg-1) 72%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--stroke) 45%,transparent);
+}
+.view[data-view="library"] .track:hover,
+.view[data-view="queue"] .track:hover,
+.view[data-view="playlists"] .track:hover,
+.view[data-view="search"] .track:hover{
+  background:color-mix(in oklab,var(--bg-2) 88%,transparent);
+}
+.view[data-view="library"] .track.is-current,
+.view[data-view="queue"] .track.is-current,
+.view[data-view="playlists"] .track.is-current,
+.view[data-view="search"] .track.is-current{
+  background:color-mix(in oklab,var(--accent) 16%,var(--bg-1) 78%);
+}
+/* and a touch more presence for the muted bits now that they have a floor */
+.t-dur{color:var(--text-2)}
+
+/* the line under "Nothing up next" — guidance, not an error */
+.queue-hint{
+  margin:10px 2px 0;max-width:52ch;
+  color:var(--text-3);font-size:14px;line-height:1.6;text-wrap:pretty;
+}
+.queue-hint b{color:var(--text-2);font-weight:600}
