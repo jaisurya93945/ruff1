@@ -9,8 +9,9 @@
    For each file it works out, in order of preference:
      title/artist/album  ID3v2 tag  →  tidied filename
      cover art           ID3 APIC   →  images/<basename>.*  →  none
-     duration            MP3 frame headers (CBR + Xing/VBR)
-   Existing entries keep any field you edited by hand, so you
+     duration            MP3 frame headers (CBR + Xing/VBR), MP4 mvhd
+   Existing entries keep any field you edited by hand, and entries
+   whose src is an http(s) URL are carried through untouched, so you
    can re-run this safely after adding files.
    ═══════════════════════════════════════════════════════════ */
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
@@ -118,6 +119,56 @@ const BITRATES = {
   'mpeg2-3': [0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,0],
 };
 const SAMPLE_RATES = { 3: [44100,48000,32000], 2: [22050,24000,16000], 0: [11025,12000,8000] };
+
+/* ── MP4 / M4A duration ───────────────────────────────────────
+   mp3Duration only understands MPEG frame headers, so an .m4a used to
+   land in the manifest with duration 0 and show as 0:00 until you played
+   it. The length is sitting in the mvhd atom: walk the box tree down
+   moov → mvhd and read timescale + duration out of it. */
+function mp4Duration(buf) {
+  const atEnd = buf.length;
+
+  function walk(start, end, want) {
+    let p = start;
+    while (p + 8 <= end) {
+      let size = buf.readUInt32BE(p);
+      const type = buf.toString('latin1', p + 4, p + 8);
+      let head = 8;
+      if (size === 1) {                       // 64-bit extended size
+        if (p + 16 > end) return null;
+        const hi = buf.readUInt32BE(p + 8);
+        size = hi * 2 ** 32 + buf.readUInt32BE(p + 12);
+        head = 16;
+      } else if (size === 0) {
+        size = end - p;                       // runs to the end of the file
+      }
+      if (size < head || p + size > end) return null;
+      if (type === want) return { body: p + head, end: p + size };
+      p += size;
+    }
+    return null;
+  }
+
+  const moov = walk(0, atEnd, 'moov');
+  if (!moov) return 0;
+  const mvhd = walk(moov.body, moov.end, 'mvhd');
+  if (!mvhd) return 0;
+
+  const b = mvhd.body;
+  const version = buf[b];
+  let timescale, units;
+  if (version === 1) {
+    if (b + 28 > mvhd.end) return 0;
+    timescale = buf.readUInt32BE(b + 20);
+    units = Number(buf.readBigUInt64BE(b + 24));
+  } else {
+    if (b + 20 > mvhd.end) return 0;
+    timescale = buf.readUInt32BE(b + 12);
+    units = buf.readUInt32BE(b + 16);
+  }
+  if (!timescale || !units) return 0;
+  return Math.round((units / timescale) * 10) / 10;
+}
 
 function mp3Duration(buf) {
   let at = 0;
@@ -240,9 +291,13 @@ function main() {
     .filter(f => AUDIO_EXT.has(extname(f).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
+  const streamed = previous.filter(t => /^https?:\/\//i.test(t.src || t.audio || ''));
+
   if (!files.length) {
-    console.log('No audio files in audio/ — nothing to do.');
-    writeFileSync(OUT, JSON.stringify([], null, 2) + '\n');
+    console.log(streamed.length
+      ? `No audio files in audio/ — keeping ${streamed.length} streaming entr${streamed.length === 1 ? 'y' : 'ies'}.`
+      : 'No audio files in audio/ — nothing to do.');
+    writeFileSync(OUT, JSON.stringify(streamed, null, 2) + '\n');
     process.exit(0);
   }
 
@@ -278,7 +333,10 @@ function main() {
       if (match) cover = `images/${match}`;
     }
 
-    const duration = extname(file).toLowerCase() === '.mp3' ? mp3Duration(buf) : 0;
+    const ext = extname(file).toLowerCase();
+    const duration = ext === '.mp3' ? mp3Duration(buf)
+                   : (ext === '.m4a' || ext === '.aac' || ext === '.mp4') ? mp4Duration(buf)
+                   : 0;
     if (duration) withDuration++;
 
     const prev = prevBySrc.get(src) || {};
@@ -297,11 +355,17 @@ function main() {
     });
   }
 
+  /* A track whose src is a URL has no file here to scan — it streams from
+     wherever it lives. Carry those through untouched, or every re-run of
+     this script would quietly delete them. */
+  tracks.push(...streamed);
+
   writeFileSync(OUT, JSON.stringify(tracks, null, 2) + '\n');
 
   const totalSec = tracks.reduce((a, t) => a + (t.duration || 0), 0);
   console.log(`\n  ${tracks.length} track${tracks.length === 1 ? '' : 's'} → audio/manifest.json`);
   console.log(`  ${withTags} with ID3 tags · ${withArt} covers extracted · ${withDuration} durations read`);
+  if (streamed.length) console.log(`  ${streamed.length} streaming from a remote URL (kept as-is)`);
   if (totalSec) console.log(`  total runtime ${Math.floor(totalSec / 60)}m ${Math.round(totalSec % 60)}s`);
   const missingArt = tracks.filter(t => !t.cover).length;
   if (missingArt) console.log(`  ${missingArt} without cover art — drop images/<filename>.jpg to match by name`);

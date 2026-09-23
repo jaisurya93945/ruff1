@@ -1,8 +1,88 @@
 [
   {
+    "title": "Bhula Dena",
+    "artist": "Aashiqui 2",
+    "album": "",
+    "src": "audio/Bhula_Dena.mp3",
+    "cover": "images/covers/bhula-dena.jpg",
+    "genre": [],
+    "year": 2013,
+    "duration": 240.8
+  },
+  {
+    "title": "Oorum Blood",
+    "artist": "Dude",
+    "album": "",
+    "src": "audio/Boom_Boom.mp3",
+    "cover": "images/covers/boom-boom.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 240.1
+  },
+  {
+    "title": "Channa Mereya",
+    "artist": "Ae Dil Hai Mushkil",
+    "album": "",
+    "src": "audio/Channa_Mereya.mp3",
+    "cover": "images/covers/channa-mereya.jpg",
+    "genre": [],
+    "year": 2026,
+    "duration": 289.5
+  },
+  {
+    "title": "Choo Lo",
+    "artist": "The Local Train",
+    "album": "",
+    "src": "audio/Choo_Lo.mp3",
+    "cover": "https://i1.sndcdn.com/artworks-u8xI3kXVRY7lo6TC-P0AKiw-t500x500.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 233.7
+  },
+  {
+    "title": "Chahun Mein Ya Na",
+    "artist": "Aashiqui 2",
+    "album": "",
+    "src": "audio/cmna.mp3",
+    "cover": "images/covers/cmna.jpg",
+    "genre": [],
+    "year": 2013,
+    "duration": 305
+  },
+  {
+    "title": "Dagabaaz Re",
+    "artist": "Dabangg 2",
+    "album": "",
+    "src": "audio/dagabaaz_re.mp3",
+    "cover": "images/covers/dagabaaz-re.jpg",
+    "genre": [],
+    "year": 2012,
+    "duration": 287.3
+  },
+  {
+    "title": "Dekha Hazaron Dafa",
+    "artist": "Rustom",
+    "album": "",
+    "src": "audio/dekha.mp3",
+    "cover": "https://c.saavncdn.com/221/Rustom-Hindi-2018-20191029174008-500x500.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 205.6
+  },
+  {
+    "title": "Hum Maarjayenge",
+    "artist": "Aashiqui 2",
+    "album": "",
+    "src": "audio/hum_mar_jayenge.mp3",
+    "cover": "images/covers/hum-mar-jayenge.jpg",
+    "genre": [],
+    "year": 2013,
+    "duration": 306.6
+  },
+  {
     "title": "Husn",
     "artist": "Anuv Jain",
-    "album": "Husn",
+    "album": "",
     "src": "audio/husn.mp3",
     "cover": "images/covers/husn.jpg",
     "genre": [],
@@ -10,13 +90,291 @@
     "duration": 218
   },
   {
-    "title": "Tum Hi Ho",
-    "artist": "Arijit Singh",
-    "album": "Aashiqui 2 (2013)",
+    "title": "Kahani Suno 2.0",
+    "artist": "Kaifi Khalil",
+    "album": "",
+    "src": "audio/kahani.mp3",
+    "cover": "images/covers/kahani.jpg",
+    "genre": [],
+    "year": 2023,
+    "duration": 173.7
+  },
+  {
+    "title": "Kannukulla (Duet)",
+    "artist": "Dude",
+    "album": "",
+    "src": "audio/Kannukulla_duet.m4a",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/dudd.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 270.9
+  },
+  {
+    "title": "Nadaniya",
+    "artist": "YouTube",
+    "album": "",
+    "src": "audio/nadaniya.mp3",
+    "cover": "images/covers/nadaniya.jpg",
+    "genre": [],
+    "year": 2024,
+    "duration": 172.9
+  },
+  {
+    "title": "Nee gundelona",
+    "artist": "Dude",
+    "album": "",
+    "src": "audio/nee_gundelo.mp3",
+    "cover": "images/covers/nee-gundelo.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 274.3
+  },
+  {
+    "title": "Oorum Blood(unplugged)",
+    "artist": "Dude",
+    "album": "",
+    "src": "audio/Oorum_Blood.mp3",
+    "cover": "images/covers/oorum-blood.jpg",
+    "genre": [],
+    "year": 2025,
+    "duration": 240.1
+  },
+  {
+    "title": "Phir Bhi Tumko Chahunga",
+    "artist": "Half Girlfriend",
+    "album": "",
+    "src": "audio/pbtc.mp3",
+    "cover": "images/covers/hgf.jpg",
+    "genre": [],
+    "year": 2017,
+    "duration": 351.7
+  },
+  {
+    "title": "Pehle Bhi Main",
+    "artist": "Animal",
+    "album": "",
+    "src": "audio/Pehle_Bhi_Main.mp3",
+    "cover": "images/covers/pehle-bhi-main.jpg",
+    "genre": [],
+    "year": 2023,
+    "duration": 250.2
+  },
+  {
+    "title": "Tum hi Ho",
+    "artist": "Aashiqui 2",
+    "album": "",
     "src": "audio/tumhiho.mp3",
     "cover": "images/covers/tumhiho.jpg",
     "genre": [],
     "year": 2013,
     "duration": 262.1
+  },
+  {
+    "title": "Ye Tune Kya Kiya",
+    "artist": "Once Upon a Time in Mumbai",
+    "album": "",
+    "src": "audio/tune_kya_kiya.mp3",
+    "cover": "images/covers/tune-kya-kiya.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 314.3
+  },
+  {
+    "title": "Enna Sona",
+    "artist": "Ok Jaanu",
+    "album": "",
+    "src": "https://koshalworld.com/files/download/id/20001",
+    "cover": "images/covers/jan.gif",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Main Rahoon Ya Na Rahoon",
+    "artist": "Armaan Malik",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/meinrahoon.mp3",
+    "cover": "https://c.saavncdn.com/395/Main-Rahoon-Ya-Na-Rahoon-Hindi-2015-500x500.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Chitti",
+    "artist": "Jathi Ratnalu",
+    "album": "",
+    "src": "https://mp3teluguwap.net/mp3/2021/Jathi%20Ratnalu/Chitti%20-%20SenSongsMp3.Com.mp3",
+    "cover": "https://c-fa.cdn.smule.com/rs-s-sf-4/arr/73/18/3f6d6a6a-6b53-419d-9ab0-fa4b26bbe9ee_1024.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Dude Metro-proposal",
+    "artist": "Dude",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Dude-Metro-Proposal-BGM.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/dude2.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Kannukulla",
+    "artist": "Dude",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Kannukulla.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/dudd.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Kannukulla(Reprise)",
+    "artist": "Dude",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Kannukulla%20(Reprise).mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/dudd.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Nallaru po",
+    "artist": "Dude",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Nallaru%20Po.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/nallaru%20po.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Bagundu po",
+    "artist": "Dude",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Baagundu%20Po.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/bagundu%20po.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Ennadi Mayavi nee",
+    "artist": "Vada chennai",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/ennadimayavi.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/ch.webp",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Aa seetha devaina",
+    "artist": "Krishna gadi veera prema gaadha",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/seetha.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/download%20(2).jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Nuvvante na navvu",
+    "artist": "Krishna gadi veera prema gaadha",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/nuvvante%20na%20navvu.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/download%20(1).jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Meine Royan",
+    "artist": "Youtube",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/meine.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/Maine-Royaan-Tanveer-Evan-500-500.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson(God)",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/bille-jean.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/billie-jean.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "They Don't Care about us",
+    "artist": "Michael Jackson(God)",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Michael%20Jackson%20-%20They%20Don't%20Care%20About%20Us.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/billie-jean.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Thousand Years",
+    "artist": "Christina Perri",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Thousand-Years.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/download%20(3).jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Thousand Years(Male)",
+    "artist": "James Arthur",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/James%20Arthur%20-%20A%20Thousand%20Years.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/hqdefault.jpg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Pal Pal",
+    "artist": "AFUSIC",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/pal_pal.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/pal_pal.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
+  },
+  {
+    "title": "Pal Pal(telugu)",
+    "artist": "rajesh",
+    "album": "",
+    "src": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/audio/Pal%20Pal%20%20-%20Telugu%20Version.mp3",
+    "cover": "https://ycpxdlltiihzxwrqavkp.supabase.co/storage/v1/object/public/songs/img/images.jpeg",
+    "genre": [],
+    "year": null,
+    "duration": 0,
+    "remote": true
   }
 ]
