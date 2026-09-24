@@ -71,16 +71,17 @@ body:has(.bg-char.on) .bg-viz{opacity:.3}
    at 2.4:1 for the duration and the row buttons.
    ───────────────────────────────────────────────────────── */
 @media (min-width:1180px){
+  /* Every screen reserves it, not just the ones with lists. Naming them
+     individually meant DNA, Lab and Settings quietly kept running their
+     content the full width, straight over her: measured, 100% of the
+     stat tile labels came in under AA with a floor of 2.5:1. A default
+     that has to be opted into is a default that gets forgotten. */
+  .view{padding-right:clamp(260px,24%,420px)}
+  /* home has the least to read, so she gets the most room there */
   .view[data-view="home"]{padding-right:clamp(320px,30%,500px)}
-  .view[data-view="library"],
-  .view[data-view="queue"],
-  .view[data-view="playlists"],
-  .view[data-view="search"]{padding-right:clamp(260px,24%,420px)}
-  /* now that nothing overlaps her on these screens, she can come forward */
-  body[data-view="library"] .bg-char.on,
-  body[data-view="queue"] .bg-char.on,
-  body[data-view="playlists"] .bg-char.on,
-  body[data-view="search"] .bg-char.on{opacity:calc(var(--char-op,.3) * 1.9)}
+  /* nothing overlaps her now, so she can come forward everywhere */
+  .bg-char.on{opacity:calc(var(--char-op,.3) * 1.9)}
+  body[data-view="home"] .bg-char.on{opacity:var(--char-op-home,.82)}
 }
 @media (min-width:1180px) and (max-width:1400px){
   .view[data-view="home"] .card-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}

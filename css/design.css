@@ -336,9 +336,35 @@ body{ font-synthesis:none; }
 .view[data-view="playlists"] .track.is-current,
 .view[data-view="search"] .track.is-current{ background:var(--row-bg-active); }
 
+/* ══════════════════════════════════════════════════════════
+   INK RANK — the quiet ink was being used for text people read
+   ══════════════════════════════════════════════════════════
+   --text-3 measures about 3.7:1 against the surfaces it sits on: fine
+   for a row index or a disabled control, below AA for anything you are
+   meant to actually read. It had drifted onto section subtitles, stat
+   labels, artist names and the player bar's track artist — measured,
+   100% of that text failed, on every screen, whether or not the
+   character artwork was anywhere near it.
+
+   So the rank moves rather than the colour: what a reader needs gets
+   --text-2 (about 7.8:1), and --text-3 stays for the genuinely
+   incidental. Raising the token itself would have flattened the
+   hierarchy everywhere instead of fixing where it was misapplied. */
+.sec-head p,
+.stat-k, .stat-s,
+.card-sub,
+.t-sub,
+.pb-text small,
+.np-tab{ color:var(--ink-mid); }
+
 /* the metadata on the right of a row is the part that has to fight the
    backdrop, so it gets the middle ink rank rather than the quietest */
 .t-dur{ color:var(--row-ink-meta); }
+
+/* A tile is a surface that carries text, so it needs the same floor a
+   row got. At e-0 over the artwork the labels had nothing under them. */
+.stat{ background:var(--row-bg); border:var(--e1-line); }
+.stat:hover{ background:var(--row-bg-hover); }
 
 /* TILE */
 .stat{
