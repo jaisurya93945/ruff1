@@ -60,13 +60,25 @@ export async function loadManifest(url = 'audio/manifest.json') {
 }
 
 /** drop tracks whose files 404, so the library never shows dead rows */
+const isRemote = (src) => {
+  try { return new URL(src, location.href).origin !== location.origin; } catch { return false; }
+};
+
 export async function pruneMissing(tracks, onProgress) {
   const alive = [];
   let done = 0;
   await Promise.all(tracks.map(async (t) => {
-    if (t.local || t.src.startsWith('blob:') || t.src.startsWith('data:')) { alive.push(t); return bump(); }
+    // A track streaming from someone else's server cannot be checked from
+    // here: a cross-origin HEAD without CORS fails whatever the file's real
+    // state, and the catch below would keep it regardless. All it buys is a
+    // round trip to a host that may simply hang — and with Promise.all,
+    // startup waits for the slowest of them. Keep it and move on.
+    if (t.local || t.src.startsWith('blob:') || t.src.startsWith('data:') || isRemote(t.src)) {
+      alive.push(t); return bump();
+    }
     try {
-      const res = await fetch(t.src, { method: 'HEAD' });
+      // even a local file server can stall; boot should never hang on this
+      const res = await fetch(t.src, { method: 'HEAD', signal: AbortSignal.timeout(4000) });
       if (res.ok) alive.push(t);
       else console.info('[aura] skipping missing file:', t.src);
     } catch { alive.push(t); }   // network hiccup — keep it, the player will report on play

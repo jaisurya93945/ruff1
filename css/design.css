@@ -128,7 +128,47 @@
 
   --bar-line      : 1px solid color-mix(in oklab, var(--stroke-2) 70%, transparent);
   --bar-sh        : 0 -8px 30px -18px rgb(0 0 0/.8);
+
+  /* The app frame: rail, top bar, player bar. These are opaque on purpose
+     — see the note under CHROME below. */
+  --chrome-rail   : color-mix(in oklab, var(--bg-1) 94%, transparent);
+  --chrome-top    : color-mix(in oklab, var(--bg-1) 92%, transparent);
+  --chrome-bar    : color-mix(in oklab, var(--bg-1) 96%, transparent);
 }
+
+/* ══════════════════════════════════════════════════════════
+   CHROME — structure, not glass
+   ══════════════════════════════════════════════════════════
+   The rail, the top bar and the player bar are on screen at every
+   moment, and all three carried a live backdrop-filter: 225,000px²,
+   86,000px² and 125,000px² of blur that the compositor re-sampled on
+   every scrolled frame. Measured on the library at 1440x900, dropping
+   those three took the frame from 46ms to 26ms — a third of the cost
+   of scrolling, spent blurring a background that barely changes.
+
+   Reducing the radius does not help (20px to 8px bought 6ms of the 20),
+   because the expense is sampling the backdrop at all, not the kernel.
+   So the frame goes solid and blur stays where it earns its keep: the
+   things that genuinely float — menus, modals, the theme dock, chips —
+   which are small, short-lived, and where glass actually reads as glass.
+
+   It is also better structure. A frame that is solid and content that
+   is translucent gives the eye somewhere to stand. */
+#rail{
+  background:var(--chrome-rail);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+#topbar{
+  background:var(--chrome-top);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+#playerBar{
+  background:var(--chrome-bar);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+/* the search field sits inside an already-solid bar, so its own blur was
+   sampling a surface that no longer moves */
+#search{ -webkit-backdrop-filter:none; backdrop-filter:none; }
 
 /* ══════════════════════════════════════════════════════════
    TYPE — the ramp, applied

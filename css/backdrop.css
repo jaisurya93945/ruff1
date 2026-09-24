@@ -26,9 +26,12 @@ body[data-view="home"] .bg-char.on{opacity:var(--char-op-home,.82)}
   background-size:contain;
   background-position:right bottom;
   background-repeat:no-repeat;
-  /* soften her left edge into the page and her feet into the player bar */
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%),linear-gradient(#000 74%,transparent 99%);
-  mask-image:linear-gradient(90deg,transparent 0%,#000 30%),linear-gradient(#000 74%,transparent 99%);
+  /* Soften her left edge into the page, her crown into the top bar, and
+     her feet into the player bar. The vertical mask used to start fully
+     opaque, so the top of the artwork met the chrome as a hard horizontal
+     line straight across the window. */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%),linear-gradient(transparent 0%,#000 9%,#000 74%,transparent 99%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 30%),linear-gradient(transparent 0%,#000 9%,#000 74%,transparent 99%);
   -webkit-mask-composite:source-in;
   mask-composite:intersect;
 }

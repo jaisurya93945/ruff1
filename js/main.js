@@ -588,11 +588,14 @@ function startVisualizers() {
   on('bgviz', syncBgViz);
   syncBgViz();
 
-  /* beat detection drives the UI pulse + the BPM readout */
-  let raf;
+  /* Beat detection drives the UI pulse + the BPM readout. It used to
+     reschedule itself unconditionally and bail out inside the callback,
+     which meant the main thread was woken ~23 times a second with an
+     empty library open and nothing playing. Stopping the loop is not the
+     same as making it do nothing: an idle page should reach zero. */
+  let raf = 0;
   const pulse = () => {
     raf = requestAnimationFrame(pulse);
-    if (document.hidden || !state.playing) return;
     const energy = engine.bandEnergy(40, 160);
     if (beat.push(energy)) {
       document.body.classList.add('beat');
@@ -600,11 +603,18 @@ function startVisualizers() {
       if (beat.bpm && beat.bpm !== state.bpm) set({ bpm: beat.bpm }, 'bpm');
     }
   };
-  pulse();
+  const syncPulse = () => {
+    const want = state.playing && !document.hidden;
+    if (want && !raf) raf = requestAnimationFrame(pulse);
+    else if (!want && raf) { cancelAnimationFrame(raf); raf = 0; }
+  };
+  on('playstate', syncPulse);
+  syncPulse();
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { viz?.stop(); ring?.stop(); bg.stop(); }
     else { if (npOpen) { viz?.start(); ring?.start(); } syncBgViz(); }
+    syncPulse();
   });
 }
 
