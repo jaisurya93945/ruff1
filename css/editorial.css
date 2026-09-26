@@ -1,0 +1,212 @@
+/* ═══════════════════════════════════════════════════════════
+   AURA · editorial — the house style.
+
+   A music magazine rather than a media player. Serif display type,
+   a hard vertical split with the reading column on the left and the
+   artwork as a full-height photographic plate on the right, square
+   corners, and the accent spent sparingly instead of everywhere.
+
+   The point of the three-layer token system is that a change of
+   house style should mostly be a change of tokens, not a rewrite of
+   every component — so this file redefines the ramps and lets them
+   flow down through the semantic and component layers. Where it does
+   name a component it is because the component's *shape* changes,
+   not its colour.
+
+   Treating the character as photography rather than as wallpaper is
+   the whole idea. Wallpaper sits behind your text and fights it;
+   a plate has an edge, holds its own column, and reads as something
+   someone chose.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── the display face ─────────────────────────────────────── */
+@font-face{
+  font-family:'Instrument Serif';
+  src:url('../fonts/instrument-serif-regular.woff2') format('woff2');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Instrument Serif';
+  src:url('../fonts/instrument-serif-italic.woff2') format('woff2');
+  font-weight:400; font-style:italic; font-display:swap;
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOKENS — the house style, expressed as ramps
+   ══════════════════════════════════════════════════════════ */
+:root{
+  --serif:'Instrument Serif',' Iowan Old Style','Palatino Linotype',Georgia,serif;
+
+  /* Square. A magazine sets type in rectangles; the only rounded
+     things left are the ones your thumb lands on. */
+  --r-xs:0px; --r-sm:0px; --r-md:0px; --r-lg:0px; --r-xl:0px; --r-2xl:0px;
+  --r-full:999px;
+
+  /* Instrument Serif is a display face — it wants to be large, tightly
+     tracked, and set at one weight. Sizes go up, tracking comes in. */
+  --t-display : clamp(46px, 7.2vw, 96px);
+  --t-1       : clamp(32px, 4.0vw, 52px);
+  --t-2       : clamp(23px, 2.0vw, 31px);
+
+  --track-display : -.022em;
+  --track-1       : -.018em;
+  --track-2       : -.012em;
+  --lh-flat       : .96;
+
+  /* Elevation stops being glass and becomes paper: a rule, not a glow.
+     Editorial depth is made of hairlines and whitespace. */
+  --e0-bg   : transparent;
+  --e0-line : 1px solid color-mix(in oklab, var(--stroke) 70%, transparent);
+  --e0-sh   : none;
+
+  --e1-bg   : color-mix(in oklab, var(--bg-1) 90%, transparent);
+  --e1-line : 1px solid color-mix(in oklab, var(--stroke-2) 80%, transparent);
+  --e1-sh   : none;
+
+  --e2-bg   : var(--bg-1);
+  --e2-line : 1px solid var(--text-3);
+  --e2-sh   : 0 30px 70px -30px rgb(0 0 0/.85);
+
+  /* rows lose their slab and become ruled entries */
+  --row-bg        : transparent;
+  --row-bg-hover  : color-mix(in oklab, var(--text) 7%, transparent);
+  --row-bg-active : color-mix(in oklab, var(--accent) 14%, transparent);
+  --row-line      : none;
+
+  --tile-bg       : transparent;
+  --tile-line     : var(--e0-line);
+}
+
+/* ══════════════════════════════════════════════════════════
+   THE PLATE — artwork with an edge
+   ══════════════════════════════════════════════════════════
+   Full height, hard-edged, flush to the right. No mask feathering
+   it into the page: the edge is the point. The reading column stops
+   well before it, so nothing is ever set over her. */
+@media (min-width:1180px){
+  /* One value drives both the plate and the column reserved for it.
+     Sizing the plate against the viewport while reserving a percentage
+     of the narrower content box meant the two disagreed by ~57px, and
+     the row controls disappeared behind her. */
+  :root{ --plate-w:clamp(340px, 37vw, 660px); }
+  .bg-char{
+    top:0; bottom:0; right:0;
+    width:var(--plate-w); max-width:none; height:100%;
+    aspect-ratio:auto;
+  }
+  .bg-char i{
+    background-size:cover;
+    background-position:58% 16%;
+    -webkit-mask-image:none; mask-image:none;
+  }
+  .bg-char.on,
+  body[data-view="home"] .bg-char.on{ opacity:1; }
+  /* The cut is the whole idea, so make it a cut: a hairline down the
+     plate's leading edge, and no full-bleed blurred cover wash bleeding
+     across it. The wash was ambience for a glass UI; here it just fogged
+     the one edge the layout is built on. */
+  .bg-char{ border-left:1px solid color-mix(in oklab,var(--text) 22%,transparent); }
+  .bg-char.on ~ .bg-art.on{ opacity:0; }
+  .view,
+  .view[data-view="home"]{ padding-right:calc(var(--plate-w) + var(--s-6)); }
+  /* the aurora was ambience for a glass UI; paper does not need it */
+  .bg-aurora{ opacity:.14; }
+}
+/* below the split point she goes back to being atmosphere */
+@media (max-width:1179px){
+  .bg-char.on,
+  body[data-view="home"] .bg-char.on{ opacity:var(--char-op-mobile,.34); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   TYPE
+   ══════════════════════════════════════════════════════════ */
+.hero h1,
+.sec-head h2,
+.t-title,
+.card-title,
+.stat-v,
+.np-title,
+#npTitle{
+  font-family:var(--serif);
+  font-weight:400;
+  font-variation-settings:normal;
+}
+
+.hero h1{ letter-spacing:var(--track-display); line-height:var(--lh-flat); max-width:13ch; }
+.hero h1 em{
+  font-style:italic;
+  background:none; -webkit-background-clip:border-box; background-clip:border-box;
+  -webkit-text-fill-color:currentColor; color:var(--accent);
+}
+.hero p.hero-sub{ font-size:17px; max-width:46ch; }
+.hero-greet{ font-size:var(--t-7); letter-spacing:.24em; text-transform:uppercase; }
+
+.sec-head{ border-bottom:1px solid color-mix(in oklab,var(--text) 55%,transparent); padding-bottom:10px; }
+.sec-head h2{ letter-spacing:var(--track-2); }
+.sec-head p{ font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; }
+.eyebrow{ letter-spacing:.26em; }
+
+.t-title{ font-size:17px; letter-spacing:-.005em; }
+.card-title{ font-size:16px; }
+.stat-v{
+  font-size:clamp(34px,3.4vw,50px); letter-spacing:-.02em;
+  background:none; -webkit-text-fill-color:var(--text); color:var(--text);
+}
+.stat-k{ letter-spacing:.2em; }
+
+/* ══════════════════════════════════════════════════════════
+   COMPONENTS whose shape changes
+   ══════════════════════════════════════════════════════════ */
+
+/* rows are ruled entries in a listing */
+.view .track{
+  border-bottom:1px solid color-mix(in oklab,var(--stroke) 60%,transparent);
+  padding:11px 6px;
+  contain-intrinsic-size:auto 62px;
+}
+.view .track.is-current{ box-shadow:inset 3px 0 0 var(--accent); }
+.t-art,.card-art,.pb-art{ border-radius:0; }
+
+/* a button is a rule with a word in it; only the primary is filled */
+.btn{
+  border:1px solid color-mix(in oklab,var(--text) 45%,transparent);
+  background:none;
+  text-transform:uppercase; letter-spacing:.1em;
+  font-size:11.5px; font-variation-settings:'wght' 620;
+}
+.btn:hover{ border-color:var(--text); background:color-mix(in oklab,var(--text) 8%,transparent); }
+.btn.primary{
+  background:var(--accent); color:var(--on-accent,#fff);
+  border-color:var(--accent); box-shadow:none;
+}
+.btn.primary:hover{ filter:brightness(1.08); box-shadow:none; }
+
+/* the frame: hairlines, no glass */
+#rail{ border-right:1px solid var(--stroke-2); background:var(--bg-0); }
+.rail-btn{ box-shadow:none; }
+.rail-btn.is-on{
+  background:none; color:var(--text);
+  box-shadow:inset 2px 0 0 var(--accent);
+}
+#topbar{ border-bottom:1px solid var(--stroke-2); background:var(--bg-0); }
+#search{
+  border:0; border-bottom:1px solid var(--stroke-2);
+  background:none; border-radius:0;
+}
+#search:focus-visible{ outline:none; border-bottom-color:var(--accent); }
+#playerBar{ border-top:1px solid var(--stroke-2); }
+
+/* tiles and setting rows: ruled, not filled */
+.stat,.set-row,.view .empty{ box-shadow:none; }
+
+/* The reading column is narrower than it was, so auto-fit at 168px packed
+   three tiles into row one and stranded the fourth on its own. Asking for
+   220px gives an even 2x2 in this column and still opens out on a wide
+   monitor. */
+.stat-grid{ grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+
+/* the round things your thumb actually lands on stay round */
+.play-btn,.card-play,.icon-btn,.switch,.chip,.seg,.seg button,
+.char-chip,.presence-pill,.t-act,.np-tab,.pb-art-glow{ border-radius:var(--r-full); }
+.seg,.chip,.np-tab{ border-radius:var(--r-full); }

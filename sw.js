@@ -19,7 +19,7 @@
    an image cannot be out of step with anything.
    ═══════════════════════════════════════════════════════════ */
 
-const VERSION = 'aura-v5';
+const VERSION = 'aura-v6';
 const SHELL = `${VERSION}-shell`;
 const MEDIA = `${VERSION}-media`;
 const NET_TIMEOUT = 4000;
@@ -28,8 +28,10 @@ const SHELL_FILES = [
   './', './index.html', './manifest.webmanifest',
   './css/core.css', './css/themes.css', './css/chars.css',
   './css/components.css', './css/backdrop.css', './css/polish.css',
-  './css/design.css', './css/anim.css',
+  './css/design.css',
+  './css/editorial.css', './css/anim.css',
   './fonts/outfit-variable.woff2',
+  './fonts/instrument-serif-regular.woff2', './fonts/instrument-serif-italic.woff2',
   './js/main.js', './js/util.js', './js/store.js', './js/db.js',
   './js/engine.js', './js/analysis.js', './js/library.js',
   './js/visualizer.js', './js/themes.js', './js/characters.js',
