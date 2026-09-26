@@ -117,6 +117,9 @@
   /* The row sits over the character artwork, so its floor has to be
      opaque enough to carry text on its own — measured, not guessed:
      at 72% the duration came in at 2.8:1. */
+  /* One floor for every surface that carries text — rows, tiles, setting
+     rows, empty states. They all sit over the character artwork and they
+     all failed the same way when each invented its own translucency. */
   --row-bg        : color-mix(in oklab, var(--bg-1) 88%, transparent);
   --row-ink-meta  : var(--ink-mid);
   --row-bg-hover  : color-mix(in oklab, var(--bg-2) 88%, transparent);
@@ -361,10 +364,21 @@ body{ font-synthesis:none; }
    backdrop, so it gets the middle ink rank rather than the quietest */
 .t-dur{ color:var(--row-ink-meta); }
 
-/* A tile is a surface that carries text, so it needs the same floor a
-   row got. At e-0 over the artwork the labels had nothing under them. */
-.stat{ background:var(--row-bg); border:var(--e1-line); }
-.stat:hover{ background:var(--row-bg-hover); }
+/* Every surface that carries text gets the same floor. Fixing these one
+   class at a time is how .stat and .set-row ended up at different
+   translucencies with the same problem; naming them together is the
+   only thing that keeps them honest. */
+.stat,
+.set-row,
+.view .empty{ background:var(--row-bg); border:var(--e1-line); }
+.stat:hover,
+.set-row:hover{ background:var(--row-bg-hover); }
+.view .empty{ border-radius:var(--r-lg); }
+
+/* and the small print inside them, which was still on the quiet ink */
+.set-row .grow small,
+.set-group>h3,
+.view .empty p{ color:var(--ink-mid); }
 
 /* TILE */
 .stat{
