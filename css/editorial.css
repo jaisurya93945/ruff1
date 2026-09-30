@@ -123,6 +123,8 @@
    ══════════════════════════════════════════════════════════ */
 .hero h1,
 .sec-head h2,
+.modal-head h3,
+.dock-head h3,
 .t-title,
 .card-title,
 .stat-v,
@@ -144,7 +146,16 @@
 
 .sec-head{ border-bottom:1px solid color-mix(in oklab,var(--text) 55%,transparent); padding-bottom:10px; }
 .sec-head h2{ letter-spacing:var(--track-2); }
-.sec-head p{ font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; }
+/* dialogs were the one place still setting headings in the UI sans, which
+   made every modal read as a different application */
+.modal-head h3,.dock-head h3{ font-size:26px; letter-spacing:var(--track-2); }
+.modal-head p,.dock-head p{ color:var(--ink-mid); }
+/* Small caps are for labels, not sentences. "WHERE YOU LEFT OFF" reads as
+   a caption; "THINGS MOST PLAYERS DON'T HAVE. ALL OF IT IS LIVE — CHANGE
+   IT WHILE SOMETHING PLAYS." wrapped to two uppercase lines and stopped
+   being readable. Section subtitles are sentences, so they stay sentences;
+   the eyebrows and stat keys below are genuine labels and keep their caps. */
+.sec-head p{ font-size:12.5px; letter-spacing:.015em; line-height:1.5; }
 .eyebrow{ letter-spacing:.26em; }
 
 .t-title{ font-size:17px; letter-spacing:-.005em; }
