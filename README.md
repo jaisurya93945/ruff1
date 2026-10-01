@@ -63,11 +63,19 @@ They're read locally, tags and all, and stay on your device.
 - Drag-and-drop import, folder picker, `.lrc` sidecar lyrics
 
 ### Look
+An editorial house style: Instrument Serif for display type, square corners,
+hairline rules instead of glass, and the character artwork treated as a
+full-height photographic plate on the right rather than as wallpaper behind
+the text. The reading column never overlaps it.
+
 - **Character themes** whose entire palette is extracted from the artwork, in **light and dark**
 - **4 surface styles**: Glass, Aurora, Neumorph, Flat
 - **Accent from cover art** — the whole UI recolours from whatever is playing
 - 6 visualisers: Spectrum, Ribbon, Radial, Starfield, Aurora, Terrain
-- Beat-reactive UI pulse, ambient aurora background, lazy-loaded artwork
+- Tracks with no artwork get a cover generated from the title — deterministic,
+  so the library stays recognisable, and nothing has to be fetched to draw it
+- Built on a three-layer token system (primitive → semantic → component), so
+  the house style is a change of ramps rather than a rewrite
 - Works from 320px to ultrawide; respects `prefers-reduced-motion`
 
 ### Things other players don't have
@@ -218,9 +226,10 @@ Out of the box everything is local to one browser. **Tab party** (in the Lab)
 syncs tabs on one device via `BroadcastChannel` — it cannot cross devices,
 because nothing in a static site can.
 
-For real phone-to-laptop sync, deploy `tools/aura-worker.js` to a free
-Cloudflare Worker — setup steps are in the file's header, about three minutes —
-then fill in **Settings → Sync across devices**:
+For real phone-to-laptop sync you need a worker to pass data through.
+**Settings → Sync across devices** walks you through it while it is
+unconfigured: four steps, a button that copies `tools/aura-worker.js` to your
+clipboard, and about three minutes on Cloudflare's free tier. Then fill in:
 
 | | |
 |---|---|
@@ -228,7 +237,9 @@ then fill in **Settings → Sync across devices**:
 | **Room key** | any long private string, *identical* on every device |
 
 The room key is the only credential. Anyone who knows it can read and write
-your data, so treat it like a password.
+your data, so treat it like a password — which is why it travels in an
+`X-Room` header rather than a query string, where Cloudflare's request logs
+and your browser history would both keep a copy.
 
 **What syncs:** playlists, favourites, moment marks, play counts, theme, EQ,
 and the track + position you were on.
@@ -302,10 +313,13 @@ picker becomes a file picker, the share sheet becomes a download.
 
 ## Privacy
 
-Nothing leaves your device. There is no analytics, no account, no sync, no
-network call other than the files you're playing — plus Google Fonts for the
-typeface (it falls back to system fonts if blocked) and, only if you configure
-one yourself, your own sync worker.
+Nothing leaves your device. No analytics, no account, no telemetry, and —
+unless you configure a sync worker yourself — **no outbound request at all**.
+Both typefaces are served from `fonts/`, so there is no call to Google Fonts
+or any other CDN.
+
+The one exception is a track whose `src` is a remote URL: that streams from
+whatever host it names. Everything in `audio/` plays from your own origin.
 
 Library metadata, playlists, favourites, marks and statistics live in
 `localStorage`. Imported audio and cached waveforms live in IndexedDB. Export

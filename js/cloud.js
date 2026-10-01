@@ -87,12 +87,18 @@ export const cloud = {
 
   /* ── request helper ──────────────────────────────────── */
   async call(path, { method = 'GET', body = null } = {}) {
-    const room = encodeURIComponent((state.settings.syncRoom || '').trim());
-    const url = `${this.base()}${path}${path.includes('?') ? '&' : '?'}room=${room}`;
+    // The room key is a password. It goes in a header, not the query string,
+    // where it would be written to Cloudflare's logs and the browser's
+    // history. The worker still accepts ?room= for older deployments.
+    const room = (state.settings.syncRoom || '').trim();
+    const url = `${this.base()}${path}`;
+    const headers = { 'X-Room': room };
+    if (body) headers['Content-Type'] = 'application/json';
     const res = await fetch(url, {
       method,
       cache: 'no-store',
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      referrerPolicy: 'no-referrer',
+      headers,
       body: body ? JSON.stringify(body) : undefined,
     });
     if (!res.ok) {

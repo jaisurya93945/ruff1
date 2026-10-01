@@ -107,7 +107,7 @@ async function presence(url, env, cors) {
 
 /* ── library state: playlists, favourites, marks, stats ───── */
 async function state(request, url, env, cors) {
-  const room = roomOf(url);
+  const room = roomOf(url, request);
   if (!room.ok) return json({ error: room.error }, cors, 400);
   if (!env.AURA) return json({ error: 'no KV namespace bound — add a binding named AURA' }, cors, 503);
 
@@ -139,7 +139,7 @@ async function state(request, url, env, cors) {
 
 /* ── now playing: for handoff and Live Follow ─────────────── */
 async function now(request, url, env, cors) {
-  const room = roomOf(url);
+  const room = roomOf(url, request);
   if (!room.ok) return json({ error: room.error }, cors, 400);
   if (!env.AURA) return json({ error: 'no KV namespace bound — add a binding named AURA' }, cors, 503);
 
@@ -175,9 +175,14 @@ async function now(request, url, env, cors) {
 }
 
 /* ── helpers ──────────────────────────────────────────────── */
-function roomOf(url) {
-  const raw = (url.searchParams.get('room') || '').trim();
-  if (!raw) return { ok: false, error: 'missing ?room=' };
+/* The room key is the only credential this thing has, so it travels in a
+   header. A query string ends up in Cloudflare's request logs, in any proxy
+   in front of them, and in browser history — none of which is a place for a
+   password. ?room= is still accepted so a worker deployed from an older copy
+   of this file keeps talking to a newer client, and vice versa. */
+function roomOf(url, request) {
+  const raw = ((request && request.headers.get('X-Room')) || url.searchParams.get('room') || '').trim();
+  if (!raw) return { ok: false, error: 'missing room key (send the X-Room header)' };
   if (raw.length < MIN_ROOM_LEN) return { ok: false, error: `room key must be at least ${MIN_ROOM_LEN} characters` };
   if (raw.length > 128) return { ok: false, error: 'room key too long' };
   // namespace it so a room key can never collide with a presence key
@@ -200,7 +205,7 @@ function corsFor(request) {
   return {
     'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
     'Access-Control-Allow-Methods': 'GET, PUT, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Room',
     'Access-Control-Max-Age': '86400',
     'Cache-Control': 'no-store',
   };
