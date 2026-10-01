@@ -1,9 +1,12 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · db — IndexedDB for things too big for localStorage:
+   NOCTURNE · db — IndexedDB for things too big for localStorage:
    imported audio blobs, cover blobs, and waveform peak caches.
    Every call degrades to a no-op if IDB is unavailable.
    ═══════════════════════════════════════════════════════════ */
 
+// Still 'aura' after the rename, for the same reason as the localStorage
+// prefix: this database holds imported audio blobs, decoded waveform peaks
+// and custom artwork. A new name is a new, empty database.
 const DB_NAME = 'aura';
 const DB_VERSION = 2;
 const STORES = ['blobs', 'peaks', 'meta'];
@@ -103,7 +106,7 @@ export async function persistStorage() {
   try { return await navigator.storage?.persist?.() ?? false; } catch { return false; }
 }
 
-/** wipe every AURA store — used by Settings → Reset */
+/** wipe every Nocturne store — used by Settings → Reset */
 export async function nuke() {
   for (const s of STORES) await db.clear(s);
 }

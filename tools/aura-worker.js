@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · cloud worker
+   NOCTURNE · cloud worker
 
-   One free Cloudflare Worker that gives AURA three things a
+   One free Cloudflare Worker that gives Nocturne three things a
    static site cannot do on its own:
 
      • a real global listener count
@@ -18,7 +18,7 @@
         KV namespace:   create one, call it aura
       (Presence works without it. Sync does not — it needs KV.)
 
-   3. In AURA: Settings → Sync across devices
+   3. In Nocturne: Settings → Sync across devices
         Endpoint:  https://<your-worker>.workers.dev
         Room key:  any long private string, the SAME on each
                    device. This is the only credential — anyone

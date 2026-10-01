@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
 <meta name="color-scheme" content="dark light">
-<title>AURA — Music Player</title>
-<meta name="description" content="AURA · a private, offline-first music player with live visualizers, spatial audio and anime themes.">
+<title>NOCTURNE — Music Player</title>
+<meta name="description" content="NOCTURNE · a private, offline-first music player with live visualizers, spatial audio and anime themes.">
 <meta name="theme-color" content="#0b0714">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="images/favi.png">
@@ -40,7 +40,7 @@
 <!-- ══════════ boot splash ══════════ -->
 <div id="boot">
   <div class="boot-mark"><span class="ring"></span><span class="ring r2"></span><b>A</b></div>
-  <p class="boot-name">AURA</p>
+  <p class="boot-name">NOCTURNE</p>
   <p class="boot-sub" id="bootSub">waking the speakers…</p>
 </div>
 
@@ -49,21 +49,21 @@
 
   <!-- left rail (desktop) -->
   <aside id="rail">
-    <div class="rail-brand" title="AURA">
+    <div class="rail-brand" title="NOCTURNE">
       <span class="brand-glyph"><svg class="ico"><use href="#i-aura"/></svg></span>
-      <span class="brand-text">AURA</span>
+      <span class="brand-text">NOCTURNE</span>
     </div>
     <nav class="rail-nav" aria-label="Primary">
-      <button class="rail-btn is-on" data-view="home"><svg class="ico"><use href="#i-home"/></svg><span>Home</span></button>
-      <button class="rail-btn" data-view="library"><svg class="ico"><use href="#i-library"/></svg><span>Library</span></button>
-      <button class="rail-btn" data-view="queue"><svg class="ico"><use href="#i-queue"/></svg><span>Queue</span><i class="rail-badge" id="queueBadge">0</i></button>
-      <button class="rail-btn" data-view="playlists"><svg class="ico"><use href="#i-playlist"/></svg><span>Playlists</span></button>
-      <button class="rail-btn" data-view="stats"><svg class="ico"><use href="#i-dna"/></svg><span>DNA</span></button>
-      <button class="rail-btn" data-view="lab"><svg class="ico"><use href="#i-lab"/></svg><span>Lab</span></button>
-      <button class="rail-btn" data-view="settings"><svg class="ico"><use href="#i-settings"/></svg><span>Settings</span></button>
+      <button class="rail-btn is-on" data-view="home" aria-label="Home"><svg class="ico"><use href="#i-home"/></svg><span>Home</span></button>
+      <button class="rail-btn" data-view="library" aria-label="Library"><svg class="ico"><use href="#i-library"/></svg><span>Library</span></button>
+      <button class="rail-btn" data-view="queue" aria-label="Queue"><svg class="ico"><use href="#i-queue"/></svg><span>Queue</span><i class="rail-badge" id="queueBadge">0</i></button>
+      <button class="rail-btn" data-view="playlists" aria-label="Playlists"><svg class="ico"><use href="#i-playlist"/></svg><span>Playlists</span></button>
+      <button class="rail-btn" data-view="stats" aria-label="DNA"><svg class="ico"><use href="#i-dna"/></svg><span>DNA</span></button>
+      <button class="rail-btn" data-view="lab" aria-label="Lab"><svg class="ico"><use href="#i-lab"/></svg><span>Lab</span></button>
+      <button class="rail-btn" data-view="settings" aria-label="Settings"><svg class="ico"><use href="#i-settings"/></svg><span>Settings</span></button>
     </nav>
     <div class="rail-foot">
-      <button class="rail-btn ghost" id="railTheme"><svg class="ico"><use href="#i-palette"/></svg><span>Theme</span></button>
+      <button class="rail-btn ghost" id="railTheme" aria-label="Theme"><svg class="ico"><use href="#i-palette"/></svg><span>Theme</span></button>
       <div class="presence-pill" id="presencePill" title="People listening right now">
         <span class="pulse-dot"></span>
         <b id="presenceCount">—</b><span class="presence-label">listening</span>
@@ -82,10 +82,10 @@
         <button class="icon-btn tiny search-clear" id="searchClear" hidden aria-label="Clear search"><svg class="ico"><use href="#i-close"/></svg></button>
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" id="btnImport" title="Add local files (⌘/Ctrl+O)"><svg class="ico"><use href="#i-plus"/></svg></button>
-        <button class="icon-btn" id="btnMoodDj" title="Mood DJ — build an energy arc"><svg class="ico"><use href="#i-wand"/></svg></button>
-        <button class="icon-btn" id="btnHelp" title="Keyboard shortcuts (?)"><svg class="ico"><use href="#i-keyboard"/></svg></button>
-        <button class="icon-btn only-mobile" id="mobilePresence" title="Listeners"><span class="pulse-dot"></span><b id="presenceCountM">—</b></button>
+        <button class="icon-btn" id="btnImport" title="Add local files (⌘/Ctrl+O)" aria-label="Add local files"><svg class="ico"><use href="#i-plus"/></svg></button>
+        <button class="icon-btn" id="btnMoodDj" title="Mood DJ — build an energy arc" aria-label="Mood DJ"><svg class="ico"><use href="#i-wand"/></svg></button>
+        <button class="icon-btn" id="btnHelp" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><svg class="ico"><use href="#i-keyboard"/></svg></button>
+        <button class="icon-btn only-mobile" id="mobilePresence" title="Listeners" aria-label="People listening right now"><span class="pulse-dot"></span><b id="presenceCountM">—</b></button>
       </div>
     </header>
 
@@ -115,28 +115,28 @@
   <div class="pb-seek" id="pbSeek"><i class="pb-buffered" id="pbBuffered"></i><i class="pb-played" id="pbPlayed"></i><i class="pb-head" id="pbHead"></i></div>
   <div class="pb-inner">
     <button class="pb-meta" id="pbMeta" title="Open now playing">
-      <span class="pb-art"><img id="pbArt" alt="" decoding="async"><i class="pb-art-glow"></i></span>
+      <span class="pb-art"><img id="pbArt" alt="" decoding="async" width="54" height="54"><i class="pb-art-glow"></i></span>
       <span class="pb-text">
         <b id="pbTitle">Nothing playing</b>
         <small id="pbArtist">pick a track to begin</small>
       </span>
     </button>
     <div class="pb-controls">
-      <button class="icon-btn" id="btnShuffle" title="Shuffle (S)"><svg class="ico"><use href="#i-shuffle"/></svg></button>
-      <button class="icon-btn" id="btnPrev" title="Previous (K)"><svg class="ico"><use href="#i-prev"/></svg></button>
-      <button class="play-btn" id="btnPlay" title="Play / Pause (Space)"><svg class="ico ico-play"><use href="#i-play"/></svg><svg class="ico ico-pause"><use href="#i-pause"/></svg><i class="play-ring"></i></button>
-      <button class="icon-btn" id="btnNext" title="Next (L)"><svg class="ico"><use href="#i-next"/></svg></button>
-      <button class="icon-btn" id="btnRepeat" title="Repeat (R)"><svg class="ico"><use href="#i-repeat"/></svg></button>
+      <button class="icon-btn" id="btnShuffle" title="Shuffle (S)" aria-label="Shuffle"><svg class="ico"><use href="#i-shuffle"/></svg></button>
+      <button class="icon-btn" id="btnPrev" title="Previous (K)" aria-label="Previous"><svg class="ico"><use href="#i-prev"/></svg></button>
+      <button class="play-btn" id="btnPlay" title="Play / Pause (Space)" aria-label="Play / Pause"><svg class="ico ico-play"><use href="#i-play"/></svg><svg class="ico ico-pause"><use href="#i-pause"/></svg><i class="play-ring"></i></button>
+      <button class="icon-btn" id="btnNext" title="Next (L)" aria-label="Next"><svg class="ico"><use href="#i-next"/></svg></button>
+      <button class="icon-btn" id="btnRepeat" title="Repeat (R)" aria-label="Repeat"><svg class="ico"><use href="#i-repeat"/></svg></button>
     </div>
     <div class="pb-right">
       <span class="pb-time"><b id="pbCur">0:00</b><i>/</i><span id="pbDur">0:00</span></span>
-      <button class="icon-btn" id="btnLike" title="Favourite (F)"><svg class="ico"><use href="#i-heart"/></svg></button>
-      <button class="icon-btn" id="btnMark" title="Drop a Moment Mark (M)"><svg class="ico"><use href="#i-mark"/></svg></button>
+      <button class="icon-btn" id="btnLike" title="Favourite (F)" aria-label="Favourite"><svg class="ico"><use href="#i-heart"/></svg></button>
+      <button class="icon-btn" id="btnMark" title="Drop a Moment Mark (M)" aria-label="Drop a Moment Mark"><svg class="ico"><use href="#i-mark"/></svg></button>
       <div class="vol-wrap">
-        <button class="icon-btn" id="btnMute" title="Mute (Shift+M)"><svg class="ico"><use href="#i-vol"/></svg></button>
+        <button class="icon-btn" id="btnMute" title="Mute (Shift+M)" aria-label="Mute"><svg class="ico"><use href="#i-vol"/></svg></button>
         <input id="vol" class="range vol-range" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume">
       </div>
-      <button class="icon-btn" id="btnExpand" title="Full screen (E)"><svg class="ico"><use href="#i-expand"/></svg></button>
+      <button class="icon-btn" id="btnExpand" title="Full screen (E)" aria-label="Full screen"><svg class="ico"><use href="#i-expand"/></svg></button>
     </div>
   </div>
 </div>
@@ -152,13 +152,13 @@
       <button class="np-tab" data-pane="lyrics">Lyrics</button>
       <button class="np-tab" data-pane="up">Up next</button>
     </div>
-    <button class="icon-btn" id="npVizMode" title="Cycle visualizer (V)"><svg class="ico"><use href="#i-viz"/></svg></button>
+    <button class="icon-btn" id="npVizMode" title="Cycle visualizer (V)" aria-label="Cycle visualizer"><svg class="ico"><use href="#i-viz"/></svg></button>
   </div>
 
   <div class="np-body">
     <div class="np-pane is-on" data-pane="art">
       <div class="np-cover" id="npCover">
-        <img id="npArt" alt="" decoding="async">
+        <img id="npArt" alt="" decoding="async" width="420" height="420">
         <canvas id="npRing"></canvas>
         <div class="np-orbit" id="npOrbit"><i></i></div>
       </div>
@@ -180,11 +180,11 @@
     </div>
     <div class="np-times"><b id="npCur">0:00</b><span id="npDur">0:00</span></div>
     <div class="np-controls">
-      <button class="icon-btn" id="npShuffle" title="Shuffle"><svg class="ico"><use href="#i-shuffle"/></svg></button>
-      <button class="icon-btn lg" id="npPrev"><svg class="ico"><use href="#i-prev"/></svg></button>
-      <button class="play-btn xl" id="npPlay"><svg class="ico ico-play"><use href="#i-play"/></svg><svg class="ico ico-pause"><use href="#i-pause"/></svg><i class="play-ring"></i></button>
-      <button class="icon-btn lg" id="npNext"><svg class="ico"><use href="#i-next"/></svg></button>
-      <button class="icon-btn" id="npRepeat" title="Repeat"><svg class="ico"><use href="#i-repeat"/></svg></button>
+      <button class="icon-btn" id="npShuffle" title="Shuffle" aria-label="Shuffle"><svg class="ico"><use href="#i-shuffle"/></svg></button>
+      <button class="icon-btn lg" id="npPrev" aria-label="Previous"><svg class="ico"><use href="#i-prev"/></svg></button>
+      <button class="play-btn xl" id="npPlay" aria-label="Play / Pause"><svg class="ico ico-play"><use href="#i-play"/></svg><svg class="ico ico-pause"><use href="#i-pause"/></svg><i class="play-ring"></i></button>
+      <button class="icon-btn lg" id="npNext" aria-label="Next"><svg class="ico"><use href="#i-next"/></svg></button>
+      <button class="icon-btn" id="npRepeat" title="Repeat" aria-label="Repeat"><svg class="ico"><use href="#i-repeat"/></svg></button>
     </div>
     <div class="np-chips">
       <button class="chip" id="chipEq"><svg class="ico"><use href="#i-eq"/></svg>Equalizer</button>
@@ -259,6 +259,6 @@
 </svg>
 
 <script type="module" src="js/main.js"></script>
-<noscript><div style="padding:3rem;text-align:center;font-family:system-ui;color:#fff">AURA needs JavaScript enabled.</div></noscript>
+<noscript><div style="padding:3rem;text-align:center;font-family:system-ui;color:#fff">NOCTURNE needs JavaScript enabled.</div></noscript>
 </body>
 </html>

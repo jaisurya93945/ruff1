@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · analysis — everything derived from the audio itself:
+   NOCTURNE · analysis — everything derived from the audio itself:
    waveform peaks, track energy, live beat detection, and the
    accent colour pulled out of the album art.
    ═══════════════════════════════════════════════════════════ */

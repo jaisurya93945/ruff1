@@ -88,7 +88,7 @@ const server = createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n  AURA is serving on  http://localhost:${PORT}\n`);
+  console.log(`\n  Nocturne is serving on  http://localhost:${PORT}\n`);
   console.log(`  root   ${ROOT}`);
   console.log(`  stop   Ctrl-C\n`);
 });

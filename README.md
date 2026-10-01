@@ -1,6 +1,6 @@
 <div align="center">
 
-# AURA
+# NOCTURNE
 
 **A private, offline-first music player.**
 No account. No server. No telemetry. Your library, your device, your data.

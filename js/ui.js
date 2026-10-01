@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · ui — the shared pieces every view leans on:
+   NOCTURNE · ui — the shared pieces every view leans on:
    toasts, modals, context menus, track rows, lazy images,
    the waveform (with its echo-heat overlay), and lyrics.
    ═══════════════════════════════════════════════════════════ */

@@ -14,7 +14,7 @@ import { createRequire } from 'node:module';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'images');
 
-/** the AURA mark: a soft gradient field, the chevron, an orbit ring */
+/** the Nocturne mark: a soft gradient field, the chevron, an orbit ring */
 const mark = (size, { padding = 0.12, rounded = true } = {}) => {
   const p = size * padding;
   const inner = size - p * 2;

@@ -1,6 +1,6 @@
 {
-  "name": "AURA — Music Player",
-  "short_name": "AURA",
+  "name": "NOCTURNE — Music Player",
+  "short_name": "NOCTURNE",
   "description": "A private, offline-first music player with live visualisers, spatial audio and anime themes.",
   "start_url": "./",
   "scope": "./",

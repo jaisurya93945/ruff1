@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · player — the transport. Owns the queue, the history,
+   NOCTURNE · player — the transport. Owns the queue, the history,
    stats, the Media Session, and the hand-off between tracks.
    It talks to the UI only through events, never by importing it.
    ═══════════════════════════════════════════════════════════ */
@@ -264,7 +264,7 @@ export const player = {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
         artist: track.artist,
-        album: track.album || 'AURA',
+        album: track.album || 'Nocturne',
         artwork: track.cover ? [96, 128, 192, 256, 384, 512].map(s => ({
           src: track.cover, sizes: `${s}x${s}`, type: 'image/png',
         })) : [],

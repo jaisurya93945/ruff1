@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · views — everything inside #views, plus the dialogs
+   NOCTURNE · views — everything inside #views, plus the dialogs
    that hang off them.
    ═══════════════════════════════════════════════════════════ */
 import { $, $$, el, icon, fmtTime, fmtSpan, fmtCount, clamp, searchTracks, debounce, supports, download, ls } from './util.js';
@@ -935,7 +935,40 @@ RENDERERS.settings = (root) => {
   syncEp.addEventListener('change', saveSync);
   syncRoom.addEventListener('change', saveSync);
 
+  /* Sync does nothing until a worker exists, and the only thing that said
+     so was one line of grey small print pointing at a file header. If it
+     is not set up, say so loudly and put the actual steps on the screen. */
+  const setupPanel = cloud.enabled ? null : el('div.set-row.sync-setup', { style: { display: 'block' } }, [
+    el('b', { text: 'Sync is not set up yet' }),
+    el('p', { html: 'Nothing syncs between your phone and your laptop until a worker exists to pass it through. '
+      + 'It is free, it takes about three minutes, and the data only ever lives in <em>your</em> Cloudflare account.' }),
+    el('ol.sync-steps', {}, [
+      el('li', { html: 'Open <b>dash.cloudflare.com</b> → Workers &amp; Pages → Create → Worker. Deploy the hello-world, then <b>Edit code</b>.' }),
+      el('li', { html: 'Paste the worker source over it and Deploy again.' }),
+      el('li', { html: 'Settings → Bindings → Add → <b>KV namespace</b>. Variable name <code>AURA</code>, namespace <code>aura</code>. Sync needs this; the listener count does not.' }),
+      el('li', { html: 'Paste the worker URL below, generate a room key, and use the pairing link to carry it to your other device.' }),
+    ]),
+    el('div.row', { style: { gap: '8px', marginTop: '10px' } }, [
+      el('button.btn.sm.primary', {
+        onclick: async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          const was = btn.textContent;
+          try {
+            const src = await (await fetch('tools/aura-worker.js')).text();
+            await navigator.clipboard.writeText(src);
+            toast('Worker source copied — paste it into the Cloudflare editor', { icon: 'check', ms: 5000 });
+          } catch {
+            toast('Could not copy. Open tools/aura-worker.js in the repo and copy it by hand.', { error: true, ms: 6000 });
+          }
+          btn.disabled = false; btn.textContent = was;
+        },
+      }, [icon('download'), 'Copy Worker Source']),
+    ]),
+  ]);
+
   root.append(group('Sync across devices', [
+    setupPanel,
     el('div.set-row', {}, [
       el('div.grow', {}, [el('b', { text: 'Status' }), syncState]),
       testBtn,
@@ -1067,7 +1100,7 @@ RENDERERS.settings = (root) => {
       el('div.grow', {}, [el('b', { text: 'Reset everything' }), el('small', { text: 'clears settings, playlists, stats and cached waveforms' })]),
       el('button.btn.sm.danger', {
         onclick: async () => {
-          if (await confirm({ title: 'Reset AURA?', sub: 'Every playlist, favourite, mark and statistic is erased. Your audio files are untouched.', confirmLabel: 'Erase everything', danger: true })) {
+          if (await confirm({ title: 'Reset Nocturne?', sub: 'Every playlist, favourite, mark and statistic is erased. Your audio files are untouched.', confirmLabel: 'Erase everything', danger: true })) {
             await nuke();
             Object.keys(localStorage).filter(k => k.startsWith('aura:')).forEach(k => localStorage.removeItem(k));
             location.reload();
@@ -1080,7 +1113,7 @@ RENDERERS.settings = (root) => {
   /* ── about ── */
   root.append(group('About', [
     el('div.set-row', { style: { display: 'block' } }, [
-      el('b', { text: 'AURA' }),
+      el('b', { text: 'NOCTURNE' }),
       el('small', { style: { marginTop: '6px' }, html:
         'A private, offline-first music player. No account, no server, no telemetry — the library, your playlists and every statistic live in this browser. ' +
         'Add music by dropping files onto the window, or by putting them in <code>audio/</code> and running <code>node tools/build-manifest.mjs</code>.' }),

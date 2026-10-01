@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · features — the parts that aren't playback:
+   NOCTURNE · features — the parts that aren't playback:
    live listener count, sleep timer, cross-tab sync,
    shareable vibe cards, Mood DJ, and the listening DNA.
    ═══════════════════════════════════════════════════════════ */
@@ -308,8 +308,8 @@ export async function makeVibeCard(track, { peaks = null, width = 1080, height =
   /* footer */
   y += wh + 74;
   ctx.fillStyle = accent;
-  ctx.font = '700 30px Outfit, system-ui, sans-serif';
-  ctx.fillText('AURA', pad, y);
+  ctx.font = '400 34px "Instrument Serif", Georgia, serif';
+  ctx.fillText('NOCTURNE', pad, y);
   ctx.fillStyle = text3;
   ctx.font = '400 26px JetBrains Mono, monospace';
   const st = statFor(track?.id);

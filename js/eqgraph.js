@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · eqgraph — the equalizer as a curve you drag.
+   NOCTURNE · eqgraph — the equalizer as a curve you drag.
 
    Ten vertical sliders tell you nothing about what the filters
    are actually doing to the sound. This draws the real combined
@@ -25,7 +25,7 @@ const GRID_HZ = [
 export class EQGraph {
   /**
    * @param {HTMLCanvasElement} canvas
-   * @param {object} engine       the AURA engine (needs .eq, .bass, .analyser)
+   * @param {object} engine       the Nocturne engine (needs .eq, .bass, .analyser)
    * @param {number[]} gains      live reference to the gain array
    * @param {(i:number, db:number)=>void} onChange
    */

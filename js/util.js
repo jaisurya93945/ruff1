@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · util — tiny helpers, no dependencies
+   NOCTURNE · util — tiny helpers, no dependencies
    ═══════════════════════════════════════════════════════════ */
 
 export const $  = (sel, root = document) => root.querySelector(sel);
@@ -36,6 +36,11 @@ export function el(spec, props = {}, kids = []) {
 export function icon(name, cls = 'ico') {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', cls);
+  // Every icon in the app comes through here and every one of them is
+  // decorative — the label is always either beside it or on the button.
+  // Without this a screen reader reads the symbol as well as the label.
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
   const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
   use.setAttribute('href', '#i-' + name);
   svg.append(use);
@@ -207,6 +212,10 @@ export function withAlpha(color, alpha = 1) {
 }
 
 /* ── persistent settings (localStorage, namespaced, safe) ─── */
+/* Deliberately still 'aura:' after the rename to Nocturne. Every favourite,
+   playlist, moment mark and play count anyone already has is filed under
+   this prefix; renaming it would read as a factory reset. The storage key
+   is not branding and there is nothing to gain by touching it. */
 const NS = 'aura:';
 export const ls = {
   get(key, fallback = null) {

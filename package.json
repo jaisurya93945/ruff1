@@ -1,5 +1,5 @@
 {
-  "name": "aura-player",
+  "name": "nocturne-player",
   "version": "1.0.0",
   "description": "A private, offline-first music player with live visualisers, spatial audio and anime themes.",
   "type": "module",

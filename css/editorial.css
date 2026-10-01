@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · editorial — the house style.
+   NOCTURNE · editorial — the house style.
 
    A music magazine rather than a media player. Serif display type,
    a hard vertical split with the reading column on the left and the
@@ -205,7 +205,13 @@
   border:0; border-bottom:1px solid var(--stroke-2);
   background:none; border-radius:0;
 }
-#search:focus-visible{ outline:none; border-bottom-color:var(--accent); }
+/* A 1px border colour change is too quiet to be the only focus signal, so
+   the rule thickens and the field lifts as well. */
+#search:focus-visible{
+  outline:none;
+  border-bottom:2px solid var(--accent);
+  background:color-mix(in oklab,var(--accent) 8%,transparent);
+}
 #playerBar{ border-top:1px solid var(--stroke-2); }
 
 /* tiles and setting rows: ruled, not filled */
@@ -221,3 +227,20 @@
 .play-btn,.card-play,.icon-btn,.switch,.chip,.seg,.seg button,
 .char-chip,.presence-pill,.t-act,.np-tab,.pb-art-glow{ border-radius:var(--r-full); }
 .seg,.chip,.np-tab{ border-radius:var(--r-full); }
+
+/* ── sync setup ───────────────────────────────────────────────
+   Shown only while sync has no worker behind it. It is the one
+   place in the app that needs to shout, so it gets the accent rule
+   and a filled heading rather than the usual hairline. */
+.sync-setup{
+  border-left:3px solid var(--accent);
+  background:color-mix(in oklab,var(--accent) 7%,transparent);
+}
+.sync-setup>b{ display:block; font-family:var(--serif); font-size:20px; margin-bottom:6px; }
+.sync-setup>p{ color:var(--ink-mid); font-size:13.5px; line-height:1.6; max-width:62ch; }
+.sync-steps{ margin:12px 0 0; padding-left:20px; display:grid; gap:7px; }
+.sync-steps li{ color:var(--ink-mid); font-size:13px; line-height:1.55; }
+.sync-steps code{
+  font-family:var(--font-mono); font-size:.92em;
+  padding:1px 5px; background:color-mix(in oklab,var(--text) 10%,transparent);
+}

@@ -19,7 +19,7 @@
    an image cannot be out of step with anything.
    ═══════════════════════════════════════════════════════════ */
 
-const VERSION = 'aura-v6';
+const VERSION = 'nocturne-v1';
 const SHELL = `${VERSION}-shell`;
 const MEDIA = `${VERSION}-media`;
 const NET_TIMEOUT = 4000;
@@ -57,7 +57,9 @@ self.addEventListener('activate', (event) => {
     // Drop every cache from an older release — a half-updated set is worse
     // than no cache at all.
     const keys = await caches.keys();
-    const stale = keys.filter(k => k.startsWith('aura-') && !k.startsWith(VERSION));
+    // 'aura-' is the pre-rename prefix — keep sweeping it or every cache
+    // from before the rename is orphaned on the user's device forever.
+    const stale = keys.filter(k => (k.startsWith('nocturne-') || k.startsWith('aura-')) && !k.startsWith(VERSION));
     await Promise.all(stale.map(k => caches.delete(k)));
 
     await self.clients.claim();

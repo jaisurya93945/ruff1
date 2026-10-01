@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · cloud — optional cross-device sync.
+   NOCTURNE · cloud — optional cross-device sync.
 
    BroadcastChannel (features.js → tabSync) only ever reaches
    other tabs in the same browser. This module is what actually

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · engine — the Web Audio graph.
+   NOCTURNE · engine — the Web Audio graph.
 
      deckA ─┐
             ├─▶ mixBus ─▶ vocal(mid/side) ─▶ EQ×10 ─▶ bass

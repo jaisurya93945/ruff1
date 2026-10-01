@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · store — one state object, a tiny pub/sub, and
+   NOCTURNE · store — one state object, a tiny pub/sub, and
    persistence for the slices worth remembering.
    ═══════════════════════════════════════════════════════════ */
 import { ls, uid } from './util.js';

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · themes — the palette registry, the picker dock, and
+   NOCTURNE · themes — the palette registry, the picker dock, and
    the live "accent from album art" pipeline.
    ═══════════════════════════════════════════════════════════ */
 import { $, el, icon, ls } from './util.js';

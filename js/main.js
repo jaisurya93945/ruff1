@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · main — boot, wiring, keyboard, and the render loop
+   NOCTURNE · main — boot, wiring, keyboard, and the render loop
    that keeps the player chrome in step with the audio.
    ═══════════════════════════════════════════════════════════ */
 import { $, $$, el, icon, fmtTime, clamp, debounce, throttle, supports, haptic, ls, pointerRatio, fmtDur} from './util.js';
@@ -335,7 +335,7 @@ function onTrackChange(track) {
   beat.reset();
   paintNpQueue();
   if (['home', 'queue', 'library'].includes(state.view)) refreshCurrentView();
-  document.title = track ? `${track.title} — ${track.artist} · AURA` : 'AURA — Music Player';
+  document.title = track ? `${track.title} — ${track.artist} · NOCTURNE` : 'NOCTURNE — Music Player';
 }
 
 function setArt(img, src, miss = FALLBACK_ART) {
@@ -749,10 +749,10 @@ window.addEventListener('error', (e) => {
 });
 
 /* expose a tiny console handle — handy when tinkering */
-window.AURA = { state, player, engine, setView, renderView, toast, get viz() { return viz; } };
+window.NOCTURNE = { state, player, engine, setView, renderView, toast, get viz() { return viz; } };
 
 start().catch(err => {
   console.error('[aura] boot failed', err);
   boot.say('something went wrong — check the console');
-  setTimeout(() => { boot.done(); toast('AURA had trouble starting. Check the browser console.', { error: true, ms: 8000 }); }, 1200);
+  setTimeout(() => { boot.done(); toast('Nocturne had trouble starting. Check the browser console.', { error: true, ms: 8000 }); }, 1200);
 });

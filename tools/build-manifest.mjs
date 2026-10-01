@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════
-   Scans audio/ and writes audio/manifest.json — the list AURA
+   Scans audio/ and writes audio/manifest.json — the list Nocturne
    reads on startup.
 
      node tools/build-manifest.mjs

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · visualizer — six canvas modes sharing one rAF loop.
+   NOCTURNE · visualizer — six canvas modes sharing one rAF loop.
    Reads the live AnalyserNode; degrades to a gentle idle
    animation when there is no audio graph (or nothing playing).
    ═══════════════════════════════════════════════════════════ */
