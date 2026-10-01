@@ -7,7 +7,7 @@
 #  runs its own "pages build and deployment" on every push to
 #  main. An actions/deploy-pages step here would be a *second*
 #  deployer competing for the same lock — which is exactly what
-#  failed on the AURA merge commit:
+#  failed on an early merge commit here:
 #
 #    HttpError: Deployment request failed ... due to in progress
 #    deployment. Please cancel first or wait for it to complete.

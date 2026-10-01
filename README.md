@@ -103,12 +103,22 @@ images/          cover art
   covers/        art extracted from ID3 tags by the builder
   chars/         character artwork, generated WebP + palettes.json
   themes/        overrides.json, if you point a theme elsewhere
-css/             core · themes · components · anim
-js/              main · player · engine · library · analysis
+fonts/           Outfit + Instrument Serif, subset to latin (OFL, see LICENSE.md)
+css/             core · themes · chars · components · backdrop
+                 polish · anim · design (the token system) · editorial (house style)
+js/              main · player · engine · library · analysis · cloud · eqgraph
                  visualizer · themes · features · ui · views · store · db · util
 tools/           build-manifest · serve · prep-art · gen-themes · gen-icons · aura-worker
 sw.js            service worker (offline shell)
 ```
+
+### Streaming tracks
+
+A track's `src` is normally a path inside `audio/`. It can also be a full
+URL, in which case it streams from that host instead: it needs a connection,
+it carries a small cloud badge in the library, and its length shows as `—`
+until the browser loads it once (after which it is remembered). The manifest
+builder leaves such entries alone, so re-running it never deletes them.
 
 ### Adding songs
 

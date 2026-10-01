@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   AURA · service worker
+   NOCTURNE · service worker
 
    ── Why this is network-first for code ──────────────────────
    The first version was cache-first for everything, which is

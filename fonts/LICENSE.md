@@ -1,4 +1,4 @@
-# Fonts bundled with AURA
+# Fonts bundled with Nocturne
 
 Both faces are subset to latin and converted to woff2, and both are served
 from this repository so the app makes no external requests.

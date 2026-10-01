@@ -15,7 +15,7 @@ Needs Settings → Actions → General → Workflow permissions →
 node tools/build-manifest.mjs
 ```
 
-Either way that writes `manifest.json` — the list AURA reads on startup.
+Either way that writes `manifest.json` — the list Nocturne reads on startup.
 
 ### Supported
 `.mp3` `.m4a` `.aac` `.ogg` `.opus` `.wav` `.flac` `.webm`
