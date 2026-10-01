@@ -325,7 +325,9 @@ engine.addEventListener('pause', () => {
 
 engine.addEventListener('loaded', (e) => {
   const d = e.detail.duration || 0;
-  if (state.current && d && !state.current.duration) {
+  // A live stream reports Infinity, which is truthy — it would be stored as a
+  // learned duration and serialise to null. Only a finite length is a length.
+  if (state.current && Number.isFinite(d) && d > 0 && !state.current.duration) {
     state.current.duration = d;
     state.durations[state.current.id] = Math.round(d * 10) / 10;
     persist.durations();

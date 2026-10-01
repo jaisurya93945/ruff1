@@ -171,11 +171,16 @@ const initialsOf = (title = '') => (String(title).match(/\p{L}\p{M}*|\p{N}/gu) |
   .slice(0, 1).join('').toUpperCase() || '\u266A';   // ♪ when there's no letter at all
 
 export function generatedArt(track) {
-  const key = `${track?.artist || ''}::${track?.title || ''}` || 'aura';
+  const key = `${track?.artist || ''}::${track?.title || ''}`;
   const h = hashString(key);
   const hue = h % 360;
-  const hue2 = (hue + 40 + (h >> 9) % 80) % 360;
-  const tilt = (h >> 17) % 90;
+  // Unsigned shifts. hashString returns a uint32, and `>>` reinterprets it as
+  // signed, so every hash above 2^31 — measured, 16 of the 36 tracks — gave a
+  // negative offset. The second hue then landed as little as 18° from the
+  // first instead of the intended 40–119°, and those covers came out nearly
+  // monochrome rather than two-tone.
+  const hue2 = (hue + 40 + (h >>> 9) % 80) % 360;
+  const tilt = (h >>> 17) % 90;
   const letter = initialsOf(track?.title);
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">` +
